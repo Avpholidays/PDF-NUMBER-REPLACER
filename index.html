@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PDF Number Finder & Replacer</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #172033;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      color: #667085;
+      margin-bottom: 25px;
+    }
+
+    .upload-box {
+      border: 2px dashed #b8c2d1;
+      border-radius: 14px;
+      padding: 35px;
+      text-align: center;
+      background: #fafcff;
+    }
+
+    input[type="file"] {
+      margin-top: 15px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-size: 15px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .primary {
+      background: #1769e0;
+      color: white;
+    }
+
+    .primary:hover {
+      background: #0f56bd;
+    }
+
+    .secondary {
+      background: #eef2f7;
+      color: #172033;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 20px;
+      padding: 14px;
+      border-radius: 10px;
+      background: #f1f5f9;
+      display: none;
+    }
+
+    .results {
+      margin-top: 25px;
+      display: none;
+    }
+
+    .number-card {
+      border: 1px solid #d9e0ea;
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 12px;
+      background: #fff;
+    }
+
+    .number {
+      font-family: monospace;
+      font-size: 18px;
+      font-weight: bold;
+      word-break: break-all;
+    }
+
+    .meta {
+      color: #667085;
+      font-size: 14px;
+      margin-top: 6px;
+    }
+
+    .replace-box {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 12px;
+      background: #f7f9fc;
+      display: none;
+    }
+
+    .replace-box input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #cbd5e1;
+      border-radius: 9px;
+      font-size: 16px;
+      margin: 10px 0 15px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .progress {
+      margin-top: 15px;
+      height: 8px;
+      background: #e5e7eb;
+      border-radius: 10px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #1769e0;
+      transition: width 0.2s;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #667085;
+      margin-top: 10px;
+    }
+
+    .success {
+      background: #ecfdf3;
+      color: #067647;
+    }
+
+    .error {
+      background: #fef3f2;
+      color: #b42318;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="card">
+
+    <h1>PDF Number Finder & Replacer</h1>
+
+    <div class="subtitle">
+      Upload a PDF, detect phone-number-like strings, then replace the selected number.
+    </div>
+
+    <div class="upload-box">
+
+      <strong>Select PDF file</strong>
+
+      <br>
+
+      <input
+        type="file"
+        id="pdfFile"
+        accept="application/pdf"
+      >
+
+      <br><br>
+
+      <button
+        class="primary"
+        id="scanBtn"
+        disabled
+      >
+        Scan PDF
+      </button>
+
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div class="progress" id="progress">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <div id="results" class="results">
+
+      <h2>Detected Numbers</h2>
+
+      <div id="numberList"></div>
+
+      <div id="replaceBox" class="replace-box">
+
+        <h3>Replace Selected Number</h3>
+
+        <div>
+          Selected:
+          <strong id="selectedNumber"></strong>
+        </div>
+
+        <input
+          type="text"
+          id="newNumber"
+          placeholder="Enter new number"
+        >
+
+        <div class="actions">
+
+          <button
+            class="primary"
+            id="replaceBtn"
+          >
+            Change Number & Download PDF
+          </button>
+
+          <button
+            class="secondary"
+            id="clearBtn"
+          >
+            Clear
+          </button>
+
+        </div>
+
+        <div class="small">
+          The replacement keeps the original separators such as
+          spaces, hyphens and slashes where possible.
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+const pdfFile = document.getElementById("pdfFile");
+const scanBtn = document.getElementById("scanBtn");
+const replaceBtn = document.getElementById("replaceBtn");
+const clearBtn = document.getElementById("clearBtn");
+
+const statusBox = document.getElementById("status");
+const resultsBox = document.getElementById("results");
+const numberList = document.getElementById("numberList");
+
+const replaceBox = document.getElementById("replaceBox");
+const selectedNumberBox = document.getElementById("selectedNumber");
+const newNumberInput = document.getElementById("newNumber");
+
+const progressBox = document.getElementById("progress");
+const progressBar = document.getElementById("progressBar");
+
+let selectedFile = null;
+let detectedNumbers = [];
+let selectedNumber = null;
+
+
+/* --------------------------------------------------
+   FILE SELECTION
+-------------------------------------------------- */
+
+pdfFile.addEventListener("change", function () {
+
+  selectedFile = pdfFile.files[0];
+
+  if (!selectedFile) {
+    scanBtn.disabled = true;
+    return;
+  }
+
+  if (selectedFile.type !== "application/pdf") {
+
+    showStatus(
+      "Please select a PDF file.",
+      "error"
+    );
+
+    scanBtn.disabled = true;
+    return;
+  }
+
+  scanBtn.disabled = false;
+
+  showStatus(
+    "PDF selected: " + selectedFile.name,
+    ""
+  );
+
+});
+
+
+/* --------------------------------------------------
+   STATUS
+-------------------------------------------------- */
+
+function showStatus(message, type) {
+
+  statusBox.style.display = "block";
+  statusBox.textContent = message;
+
+  statusBox.className = "status";
+
+  if (type === "success") {
+    statusBox.classList.add("success");
+  }
+
+  if (type === "error") {
+    statusBox.classList.add("error");
+  }
+
+}
+
+
+/* --------------------------------------------------
+   DIGIT NORMALIZATION
+-------------------------------------------------- */
+
+function normalizeDigits(value) {
+
+  const map = {
+    "٠":"0","١":"1","٢":"2","٣":"3","٤":"4",
+    "٥":"5","٦":"6","٧":"7","٨":"8","٩":"9",
+
+    "۰":"0","۱":"1","۲":"2","۳":"3","۴":"4",
+    "۵":"5","۶":"6","۷":"7","۸":"8","۹":"9",
+
+    "０":"0","１":"1","２":"2","３":"3","４":"4",
+    "５":"5","６":"6","７":"7","８":"8","９":"9"
+  };
+
+  return value
+    .split("")
+    .map(ch => map[ch] || ch)
+    .join("");
+
+}
+
+
+/* --------------------------------------------------
+   PHONE CANDIDATE DETECTION
+-------------------------------------------------- */
+
+function findPhoneCandidates(text) {
+
+  text = normalizeDigits(text);
+
+  /*
+    We intentionally allow:
+
+      +52-800-461-1544
+      52-8-0-0-4-6-1-1-5-5-4
+      53/800/461/1544
+      52 800 461 1544
+      (52) 800-461-1544
+
+    We also allow a small number of letters between digits
+    because some PDFs contain transformed text.
+  */
+
+  const pattern =
+    /[+\dA-Za-z()./_\-\s]{7,}/g;
+
+  const matches = text.match(pattern) || [];
+
+  const output = [];
+
+  for (const raw of matches) {
+
+    const candidate = raw.trim();
+
+    if (!candidate) continue;
+
+    const digits = candidate.replace(/\D/g, "");
+
+    if (digits.length < 7) continue;
+
+    if (digits.length > 18) continue;
+
+    /*
+      Avoid treating ordinary long text as a number.
+    */
+
+    const letters = (candidate.match(/[A-Za-z]/g) || []).length;
+
+    if (letters > 5) continue;
+
+    /*
+      Reject obvious years/date-like strings.
+    */
+
+    if (
+      /^\d{4}$/.test(candidate) ||
+      /^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}$/.test(candidate)
+    ) {
+      continue;
+    }
+
+    output.push({
+      text: candidate,
+      digits: digits,
+      digitCount: digits.length
+    });
+
+  }
+
+  return output;
+
+}
+
+
+/* --------------------------------------------------
+   SCAN PDF
+-------------------------------------------------- */
+
+scanBtn.addEventListener("click", async function () {
+
+  if (!selectedFile) return;
+
+  scanBtn.disabled = true;
+
+  resultsBox.style.display = "none";
+  replaceBox.style.display = "none";
+
+  numberList.innerHTML = "";
+
+  detectedNumbers = [];
+
+  progressBox.style.display = "block";
+  progressBar.style.width = "0%";
+
+  try {
+
+    showStatus(
+      "Reading PDF...",
+      ""
+    );
+
+    const buffer =
+      await selectedFile.arrayBuffer();
+
+    const pdf =
+      await pdfjsLib.getDocument({
+        data: buffer
+      }).promise;
+
+    const allFound = [];
+
+    for (
+      let pageNumber = 1;
+      pageNumber <= pdf.numPages;
+      pageNumber++
+    ) {
+
+      const page =
+        await pdf.getPage(pageNumber);
+
+      const content =
+        await page.getTextContent();
+
+      const text =
+        content.items
+          .map(item => item.str)
+          .join(" ");
+
+      const candidates =
+        findPhoneCandidates(text);
+
+      for (const item of candidates) {
+
+        allFound.push({
+          ...item,
+          page: pageNumber
+        });
+
+      }
+
+      const percent =
+        Math.round(
+          (pageNumber / pdf.numPages) * 100
+        );
+
+      progressBar.style.width =
+        percent + "%";
+
+    }
+
+    /*
+      Combine identical numbers.
+    */
+
+    const grouped = new Map();
+
+    for (const item of allFound) {
+
+      const key = item.text;
+
+      if (!grouped.has(key)) {
+
+        grouped.set(key, {
+          text: item.text,
+          digits: item.digits,
+          count: 0,
+          pages: []
+        });
+
+      }
+
+      const group = grouped.get(key);
+
+      group.count++;
+
+      if (!group.pages.includes(item.page)) {
+        group.pages.push(item.page);
+      }
+
+    }
+
+    detectedNumbers =
+      Array.from(grouped.values());
+
+    renderResults();
+
+    if (detectedNumbers.length === 0) {
+
+      showStatus(
+        "No phone-number-like strings were detected.",
+        ""
+      );
+
+    } else {
+
+      showStatus(
+        detectedNumbers.length +
+        " unique number(s) detected.",
+        "success"
+      );
+
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+    showStatus(
+      "Error while reading PDF: " + error.message,
+      "error"
+    );
+
+  }
+
+  scanBtn.disabled = false;
+
+});
+
+
+/* --------------------------------------------------
+   DISPLAY RESULTS
+-------------------------------------------------- */
+
+function renderResults() {
+
+  resultsBox.style.display = "block";
+
+  numberList.innerHTML = "";
+
+  detectedNumbers.forEach((item, index) => {
+
+    const card =
+      document.createElement("div");
+
+    card.className = "number-card";
+
+    card.innerHTML = `
+
+      <div class="number">
+        ${escapeHtml(item.text)}
+      </div>
+
+      <div class="meta">
+        Digits: ${item.digits.length}
+        &nbsp; | &nbsp;
+        Found: ${item.count} time(s)
+        &nbsp; | &nbsp;
+        Page(s): ${item.pages.join(", ")}
+      </div>
+
+      <br>
+
+      <button
+        class="primary select-number"
+        data-index="${index}"
+      >
+        Select
+      </button>
+
+    `;
+
+    numberList.appendChild(card);
+
+  });
+
+  document
+    .querySelectorAll(".select-number")
+    .forEach(button => {
+
+      button.addEventListener("click", function () {
+
+        const index =
+          Number(this.dataset.index);
+
+        selectedNumber =
+          detectedNumbers[index];
+
+        selectedNumberBox.textContent =
+          selectedNumber.text;
+
+        replaceBox.style.display =
+          "block";
+
+        newNumberInput.focus();
+
+      });
+
+    });
+
+}
+
+
+/* --------------------------------------------------
+   ESCAPE HTML
+-------------------------------------------------- */
+
+function escapeHtml(value) {
+
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+}
+
+
+/* --------------------------------------------------
+   FORMAT NEW NUMBER LIKE OLD NUMBER
+-------------------------------------------------- */
+
+function formatLikeOriginal(oldValue, newValue) {
+
+  const newDigits =
+    normalizeDigits(newValue)
+      .replace(/\D/g, "");
+
+  if (!newDigits) {
+    return "";
+  }
+
+  let digitIndex = 0;
+
+  let output = "";
+
+  for (let i = 0; i < oldValue.length; i++) {
+
+    const ch = oldValue[i];
+
+    if (/\d/.test(ch)) {
+
+      if (digitIndex < newDigits.length) {
+
+        output +=
+          newDigits[digitIndex];
+
+        digitIndex++;
+
+      }
+
+    } else {
+
+      output += ch;
+
+    }
+
+  }
+
+  /*
+    If the new number contains more digits
+    than the old number, append them.
+  */
+
+  if (digitIndex < newDigits.length) {
+
+    output +=
+      newDigits.slice(digitIndex);
+
+  }
+
+  return output;
+
+}
+
+
+/* --------------------------------------------------
+   CLEAR
+-------------------------------------------------- */
+
+clearBtn.addEventListener("click", function () {
+
+  selectedNumber = null;
+
+  newNumberInput.value = "";
+
+  replaceBox.style.display = "none";
+
+});
+
+
+/* --------------------------------------------------
+   REPLACE / DOWNLOAD
+-------------------------------------------------- */
+
+replaceBtn.addEventListener("click", async function () {
+
+  if (!selectedFile || !selectedNumber) {
+
+    showStatus(
+      "Please select a detected number first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  const newNumber =
+    newNumberInput.value.trim();
+
+  if (!newNumber) {
+
+    showStatus(
+      "Enter the new number first.",
+      "error"
+    );
+
+    return;
+
+  }
+
+  replaceBtn.disabled = true;
+
+  progressBox.style.display = "block";
+
+  progressBar.style.width = "0%";
+
+  try {
+
+    const replacement =
+      formatLikeOriginal(
+        selectedNumber.text,
+        newNumber
+      );
+
+    if (!replacement) {
+
+      throw new Error(
+        "Invalid replacement number."
+      );
+
+    }
+
+    /*
+      Load original PDF.
+    */
+
+    const bytes =
+      await selectedFile.arrayBuffer();
+
+    const pdf =
+      await pdfjsLib.getDocument({
+        data: bytes
+      }).promise;
+
+    /*
+      Create new PDF.
+    */
+
+    const outputPdf =
+      await PDFLib.PDFDocument.create();
+
+    /*
+      Render every page as an image.
+
+      This removes the original text layer from
+      the generated PDF and therefore prevents the
+      old detected number from remaining as hidden
+      selectable text.
+    */
+
+    for (
+      let pageNumber = 1;
+      pageNumber <= pdf.numPages;
+      pageNumber++
+    ) {
+
+      const page =
+        await pdf.getPage(pageNumber);
+
+      const viewport =
+        page.getViewport({
+          scale: 1.5
+        });
+
+      const canvas =
+        document.createElement("canvas");
+
+      const context =
+        canvas.getContext("2d");
+
+      canvas.width =
+        Math.ceil(viewport.width);
+
+      canvas.height =
+        Math.ceil(viewport.height);
+
+      await page.render({
+        canvasContext: context,
+        viewport: viewport
+      }).promise;
+
+      /*
+        Draw replacement over detected text.
+
+        Text extraction coordinates are approximated
+        from PDF.js text items.
+      */
+
+      const content =
+        await page.getTextContent();
+
+      for (const item of content.items) {
+
+        if (!item.str) continue;
+
+        if (
+          item.str.includes(
+            selectedNumber.text
+          )
+        ) {
+
+          const tx =
+            pdfjsLib.Util.transform(
+              viewport.transform,
+              item.transform
+            );
+
+          const x =
+            tx[4];
+
+          const y =
+            tx[5];
+
+          const width =
+            item.width * 1.5;
+
+          const height =
+            Math.abs(item.transform[3]) * 1.5 || 16;
+
+          /*
+            White background patch.
+          */
+
+          context.fillStyle =
+            "#ffffff";
+
+          context.fillRect(
+            x,
+            y - height,
+            Math.max(width, 40),
+            height + 4
+          );
+
+          /*
+            Replacement text.
+          */
+
+          context.fillStyle =
+            "#000000";
+
+          const fontSize =
+            Math.max(
+              8,
+              height * 0.85
+            );
+
+          context.font =
+            fontSize + "px Arial";
+
+          context.textBaseline =
+            "alphabetic";
+
+          context.fillText(
+            replacement,
+            x,
+            y
+          );
+
+        }
+
+      }
+
+      const imageData =
+        canvas.toDataURL(
+          "image/jpeg",
+          0.92
+        );
+
+      const imageBytes =
+        dataURLToBytes(imageData);
+
+      const image =
+        await outputPdf.embedJpg(
+          imageBytes
+        );
+
+      const outPage =
+        outputPdf.addPage([
+          viewport.width,
+          viewport.height
+        ]);
+
+      outPage.drawImage(image, {
+        x: 0,
+        y: 0,
+        width: viewport.width,
+        height: viewport.height
+      });
+
+      const percent =
+        Math.round(
+          (pageNumber / pdf.numPages) * 100
+        );
+
+      progressBar.style.width =
+        percent + "%";
+
+      showStatus(
+        "Processing page " +
+        pageNumber +
+        " of " +
+        pdf.numPages + "...",
+        ""
+      );
+
+    }
+
+    const outputBytes =
+      await outputPdf.save();
+
+    const blob =
+      new Blob(
+        [outputBytes],
+        { type: "application/pdf" }
+      );
+
+    const url =
+      URL.createObjectURL(blob);
+
+    const a =
+      document.createElement("a");
+
+    a.href = url;
+
+    a.download =
+      selectedFile.name.replace(
+        /\.pdf$/i,
+        ""
+      ) +
+      "-replaced.pdf";
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+    URL.revokeObjectURL(url);
+
+    showStatus(
+      "Done! The replaced PDF has been generated.",
+      "success"
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    showStatus(
+      "Replacement error: " + error.message,
+      "error"
+    );
+
+  }
+
+  replaceBtn.disabled = false;
+
+});
+
+
+/* --------------------------------------------------
+   DATA URL -> BYTES
+-------------------------------------------------- */
+
+function dataURLToBytes(dataURL) {
+
+  const base64 =
+    dataURL.split(",")[1];
+
+  const binary =
+    atob(base64);
+
+  const bytes =
+    new Uint8Array(
+      binary.length
+    );
+
+  for (
+    let i = 0;
+    i < binary.length;
+    i++
+  ) {
+
+    bytes[i] =
+      binary.charCodeAt(i);
+
+  }
+
+  return bytes;
+
+}
+
+</script>
+
+</body>
+</html>
