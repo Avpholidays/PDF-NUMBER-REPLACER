@@ -4,492 +4,1164 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PDF Number Finder & Replacer</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f4f7fb;color:#172033}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f4f7fb;
+  color:#172033;
+}
 .wrap{max-width:1050px;margin:28px auto;padding:0 18px}
-.card{background:#fff;border:1px solid #dce3ec;border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 5px 20px rgba(20,35,55,.06)}
-h1{margin:0 0 7px;font-size:28px}.sub{color:#64748b;margin:0 0 20px}
-.drop{border:2px dashed #9aa9bb;border-radius:12px;padding:28px;text-align:center;background:#f8fafc;cursor:pointer}
-.drop.drag{border-color:#2563eb;background:#eff6ff}.drop input{display:none}
-.btn{border:0;border-radius:9px;padding:11px 17px;font-weight:700;cursor:pointer;font-size:14px}
-.primary{background:#2563eb;color:#fff}.primary:disabled{opacity:.5;cursor:not-allowed}
+.card{
+  background:#fff;
+  border:1px solid #dce3ec;
+  border-radius:14px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:0 5px 20px rgba(20,35,55,.06);
+}
+h1{margin:0 0 7px;font-size:28px}
+.sub{color:#64748b;margin:0 0 20px}
+.drop{
+  border:2px dashed #2563eb;
+  background:#eff6ff;
+  border-radius:12px;
+  padding:28px;
+  text-align:center;
+  cursor:pointer;
+}
+.drop.drag{background:#dbeafe}
+.drop input{display:none}
+.btn{
+  border:0;
+  border-radius:9px;
+  padding:11px 17px;
+  font-weight:700;
+  cursor:pointer;
+  font-size:14px;
+}
+.primary{background:#2563eb;color:#fff}
+.primary:disabled{opacity:.5;cursor:not-allowed}
 .secondary{background:#e8eef6;color:#172033}
+.green{background:#15803d;color:#fff}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-input[type=text]{width:100%;padding:13px 14px;border:1px solid #cbd5e1;border-radius:9px;font-size:17px;outline:none}
+label{font-weight:700;display:block;margin:18px 0 7px}
+input[type=text]{
+  width:100%;
+  padding:13px 14px;
+  border:1px solid #cbd5e1;
+  border-radius:9px;
+  font-size:17px;
+  outline:none;
+}
 input[type=text]:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-.label{font-weight:700;margin:18px 0 7px;display:block}
-.status{margin-top:14px;padding:12px;border-radius:9px;background:#f1f5f9;color:#475569;white-space:pre-wrap}
-.progress{height:9px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-top:12px;display:none}
+.status{
+  margin-top:14px;
+  padding:12px;
+  border-radius:9px;
+  background:#f1f5f9;
+  color:#475569;
+  white-space:pre-wrap;
+}
+.progress{
+  height:9px;
+  background:#e2e8f0;
+  border-radius:99px;
+  overflow:hidden;
+  margin-top:12px;
+}
 .bar{height:100%;width:0;background:#2563eb;transition:width .15s}
 table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
-th,td{padding:10px;border-bottom:1px solid #e5e7eb;text-align:left;vertical-align:top}
-th{background:#f8fafc}.mono{font-family:Consolas,monospace;word-break:break-all}
-.badge{display:inline-block;padding:3px 8px;border-radius:99px;background:#e2e8f0;font-size:12px}
-.hidden{display:none}.ok{color:#15803d;font-weight:700}.warn{color:#b45309;font-weight:700}
-small{color:#64748b}
-@media(max-width:650px){h1{font-size:23px}.card{padding:16px}table{font-size:12px}}
+th,td{padding:10px;border:1px solid #e5e7eb;text-align:left;vertical-align:top}
+th{background:#f8fafc}
+.badge{
+  display:inline-block;
+  padding:3px 8px;
+  border-radius:20px;
+  background:#e2e8f0;
+  font-size:12px;
+}
+.muted{color:#64748b}
+.hidden{display:none!important}
+.ok{color:#15803d;font-weight:700}
+.warn{color:#b45309;font-weight:700}
+.err{color:#b91c1c;font-weight:700}
+.small{font-size:12px;color:#64748b}
+.preview{
+  width:100%;
+  max-height:600px;
+  overflow:auto;
+  background:#e5e7eb;
+  border-radius:10px;
+  padding:10px;
+}
+.preview canvas{
+  display:block;
+  max-width:100%;
+  height:auto;
+  margin:0 auto 10px;
+  background:white;
+}
+@media(max-width:650px){
+  .wrap{padding:0 10px;margin:12px auto}
+  .card{padding:15px}
+  h1{font-size:23px}
+}
 </style>
 </head>
+
 <body>
 <div class="wrap">
+
   <div class="card">
     <h1>PDF Number Finder & Replacer</h1>
-    <p class="sub">Find phone-number-like text, enter one normal number, automatically preserve each PDF format, then download the completed PDF.</p>
+    <p class="sub">
+      Upload a PDF, detect phone numbers, enter one normal number, and replace all detected numbers while preserving each number's original separators/format.
+    </p>
 
     <div id="drop" class="drop">
-      <input id="file" type="file" accept="application/pdf,.pdf">
-      <div><b>Click to choose a PDF</b> or drag & drop it here</div>
-      <small id="fileName">No PDF selected</small>
+      <strong>Drop PDF here</strong><br>
+      <span class="muted">or click to select a PDF</span>
+      <input id="fileInput" type="file" accept="application/pdf,.pdf">
     </div>
 
-    <label class="label" for="newNumber">Your normal number</label>
-    <input id="newNumber" type="text" placeholder="+528004611149" autocomplete="off">
+    <div id="fileInfo" class="status hidden"></div>
+  </div>
 
-    <div class="row" style="margin-top:14px">
-      <button id="scanBtn" class="btn primary" disabled>Find Numbers</button>
-      <button id="replaceBtn" class="btn primary" disabled>Replace ALL & Prepare PDF</button>
-      <button id="clearBtn" class="btn secondary">Clear</button>
+  <div id="foundCard" class="card hidden">
+    <h2>Numbers found</h2>
+    <div id="summary"></div>
+    <div id="foundTable"></div>
+  </div>
+
+  <div id="replaceCard" class="card hidden">
+    <h2>Replacement number</h2>
+    <p class="muted">
+      Enter only your normal number. Example:
+      <b>+528004611149</b>
+    </p>
+
+    <label for="newNumber">Your normal number</label>
+    <input id="newNumber" type="text" inputmode="tel" autocomplete="off"
+           placeholder="+528004611149">
+
+    <div class="small" style="margin-top:8px">
+      The tool automatically applies the formatting pattern found in each PDF number.
     </div>
 
-    <div id="status" class="status">Choose a PDF to begin.</div>
-    <div id="progress" class="progress"><div id="bar" class="bar"></div></div>
-  </div>
-
-  <div id="resultsCard" class="card hidden">
-    <div class="row" style="justify-content:space-between">
-      <h2 style="margin:0">Found numbers</h2>
-      <span id="countBadge" class="badge">0 found</span>
+    <div class="row" style="margin-top:16px">
+      <button id="replaceBtn" class="btn primary">Replace ALL Numbers</button>
+      <button id="resetBtn" class="btn secondary">Reset</button>
     </div>
-    <small>Only the digits from your normal number are used. The separators/letters around each detected number are reconstructed from that number's original format.</small>
-    <div id="results"></div>
+
+    <div id="progressWrap" class="hidden">
+      <div id="status" class="status">Waiting...</div>
+      <div class="progress"><div id="bar" class="bar"></div></div>
+    </div>
   </div>
 
-  <div id="downloadCard" class="card hidden">
-    <h2 style="margin:0 0 8px">Completed</h2>
-    <div id="doneText" class="ok">All detected numbers have been replaced.</div>
-    <button id="downloadBtn" class="btn primary" style="margin-top:14px">Download Replaced PDF</button>
+  <div id="resultCard" class="card hidden">
+    <h2>Completed</h2>
+    <div id="resultText" class="status"></div>
+    <div class="row" style="margin-top:15px">
+      <button id="downloadBtn" class="btn green">Download Replaced PDF</button>
+    </div>
   </div>
+
+  <div id="previewCard" class="card hidden">
+    <h2>Preview</h2>
+    <p class="small">
+      Preview uses the original PDF page dimensions. The downloaded PDF also keeps the original page size.
+    </p>
+    <div id="preview" class="preview"></div>
+  </div>
+
 </div>
 
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
+const { PDFDocument } = PDFLib;
+
 const $ = id => document.getElementById(id);
-const state = {
-  file:null, bytes:null, pdf:null, pages:[], found:[], outputBytes:null
-};
 
-$("drop").addEventListener("click", () => $("file").click());
-$("file").addEventListener("change", e => loadFile(e.target.files[0]));
-$("drop").addEventListener("dragover", e => {e.preventDefault(); $("drop").classList.add("drag")});
-$("drop").addEventListener("dragleave", () => $("drop").classList.remove("drag"));
-$("drop").addEventListener("drop", e => {
-  e.preventDefault(); $("drop").classList.remove("drag");
-  loadFile(e.dataTransfer.files[0]);
-});
-$("scanBtn").addEventListener("click", scanPdf);
-$("replaceBtn").addEventListener("click", replaceAll);
-$("downloadBtn").addEventListener("click", downloadOutput);
-$("clearBtn").addEventListener("click", () => location.reload());
+let sourceFile = null;
+let sourceBytes = null;
+let sourcePdf = null;
+let pageData = [];
+let foundNumbers = [];
+let outputBytes = null;
 
-function setStatus(msg, cls=""){
-  $("status").textContent = msg;
-  $("status").className = "status " + cls;
+/* -----------------------------
+   Basic utilities
+----------------------------- */
+
+function sleep(ms){
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
-function setProgress(p){
-  $("progress").style.display = "block";
-  $("bar").style.width = Math.max(0,Math.min(100,p)) + "%";
-}
-function sleep0(){return new Promise(r=>setTimeout(r,0))}
 
-async function loadFile(file){
-  if(!file || file.type !== "application/pdf" && !/\.pdf$/i.test(file.name)){
-    setStatus("Please select a PDF file.","warn"); return;
+function escapeHtml(value){
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function setStatus(text, percent){
+  $("status").textContent = text;
+  $("bar").style.width = Math.max(0, Math.min(100, percent || 0)) + "%";
+}
+
+function digitsOnly(s){
+  return normalizeDigits(String(s || "")).replace(/\D/g,"");
+}
+
+/*
+  Normalize common Unicode decimal digits to ASCII.
+  This lets detection work with many non-ASCII digit styles.
+*/
+function normalizeDigits(text){
+  return String(text || "").replace(/[０-９٠-٩۰-۹]/g, ch => {
+    const cp = ch.codePointAt(0);
+    if(cp >= 0xFF10 && cp <= 0xFF19) return String(cp - 0xFF10);
+    if(cp >= 0x0660 && cp <= 0x0669) return String(cp - 0x0660);
+    if(cp >= 0x06F0 && cp <= 0x06F9) return String(cp - 0x06F0);
+    return ch;
+  });
+}
+
+function isDigitChar(ch){
+  return /\d/.test(normalizeDigits(ch));
+}
+
+function countDigits(text){
+  return (normalizeDigits(text).match(/\d/g) || []).length;
+}
+
+function countLetters(text){
+  return (text.match(/[A-Za-zÀ-ÖØ-öø-ÿ]/g) || []).length;
+}
+
+function looksLikeDateOrYear(text){
+  const t = text.trim();
+  if(/^\\d{4}$/.test(t) && Number(t) >= 1900 && Number(t) <= 2100) return true;
+  if(/^\\d{1,2}[./-]\\d{1,2}[./-]\\d{2,4}$/.test(t)) return true;
+  if(/^\\d{4}[./-]\\d{1,2}[./-]\\d{1,2}$/.test(t)) return true;
+  return false;
+}
+
+function numberScore(text, context){
+  const t = normalizeDigits(text);
+  const d = countDigits(t);
+  const letters = countLetters(t);
+  const symbols = (t.match(/[+()\/._\-]/g) || []).length;
+
+  if(d < 7 || d > 18) return -999;
+  if(looksLikeDateOrYear(t)) return -999;
+
+  // Do not treat long ordinary words as phone numbers.
+  if(letters > 5) return -999;
+
+  let score = 0;
+
+  if(d >= 8) score += 2;
+  if(d >= 10) score += 2;
+  if(symbols > 0) score += 1;
+  if(/[+]/.test(t)) score += 2;
+  if(/[-/().\s]/.test(t)) score += 1;
+
+  const c = String(context || "").toLowerCase();
+
+  const keywords = [
+    "phone","telephone","tel","mobile","mob","call",
+    "contact","whatsapp","hotline","customer service",
+    "support","number","número","telefono","teléfono",
+    "llama","llamar","comunica","comunicación"
+  ];
+
+  for(const k of keywords){
+    if(c.includes(k)){
+      score += 4;
+      break;
+    }
   }
-  state.file=file; state.bytes=new Uint8Array(await file.arrayBuffer());
-  state.pdf=null; state.pages=[]; state.found=[]; state.outputBytes=null;
-  $("fileName").textContent=file.name;
-  $("scanBtn").disabled=false;
-  $("replaceBtn").disabled=true;
-  $("resultsCard").classList.add("hidden");
-  $("downloadCard").classList.add("hidden");
-  setStatus("PDF loaded. Click “Find Numbers”.");
-}
 
-function normalizeDigits(s){
-  let out="";
-  for(const ch of s){
-    const cp=ch.codePointAt(0);
-    if(cp>=48 && cp<=57) out += ch;
-    else if(cp>=0xFF10 && cp<=0xFF19) out += String(cp-0xFF10);
-    else if(cp>=0x0660 && cp<=0x0669) out += String(cp-0x0660);
-    else if(cp>=0x06F0 && cp<=0x06F9) out += String(cp-0x06F0);
-  }
-  return out;
-}
+  // Very high digit density is a strong signal.
+  const nonSpace = t.replace(/\s/g,"");
+  const digitDensity = d / Math.max(1, nonSpace.length);
+  if(digitDensity >= .55) score += 2;
+  if(digitDensity >= .75) score += 2;
 
-function isDigit(ch){ return /[0-9]/.test(ch); }
-function isLetter(ch){ return /[A-Za-zÀ-ÖØ-öø-ÿ]/.test(ch); }
-function phoneChar(ch){ return /[0-9A-Za-zÀ-ÖØ-öø-ÿ+().\/_\-\s]/.test(ch); }
-
-function candidateScore(s){
-  const digits=normalizeDigits(s);
-  if(digits.length<7 || digits.length>18) return -999;
-  const letters=(s.match(/[A-Za-zÀ-ÖØ-öø-ÿ]/g)||[]).length;
-  const symbols=(s.match(/[+().\/_\-\s]/g)||[]).length;
-  const density=digits.length/Math.max(1,s.replace(/\s/g,"").length);
-  if(letters>4 || density<0.30) return -999;
-
-  // Avoid obvious dates/years unless the text has phone context.
-  if(/^(19|20)\d{2}$/.test(digits)) return -999;
-  if(/^\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}$/.test(s.trim())) return -999;
-
-  let score=digits.length*2 + Math.min(symbols,8);
-  if(s.includes("+")) score+=4;
-  if(/[-\/().\s]/.test(s)) score+=2;
-  if(letters) score+=1;
   return score;
 }
 
-function findCandidatesInLine(text){
-  const out=[];
-  let i=0;
-  while(i<text.length){
-    if(!isDigit(text[i]) && text[i]!=="+" && !isLetter(text[i])) {i++;continue;}
-    let start=i, j=i, digits=0, letters=0, lastDigit=-1, gapSinceDigit=0;
-    while(j<text.length){
-      const ch=text[j];
-      if(isDigit(ch)){digits++;lastDigit=j;gapSinceDigit=0;j++;continue;}
-      if(isLetter(ch)){
-        letters++; gapSinceDigit++;
-        // Letters are allowed inside/suffixes, but not as long ordinary words.
-        if(digits===0 || letters>4 || gapSinceDigit>3) break;
-        j++; continue;
-      }
-      if(/[+().\/_\-\s]/.test(ch)){
-        gapSinceDigit++;
-        // Don't allow a long gap of normal sentence text.
-        if(gapSinceDigit>10 && digits>0) break;
-        j++; continue;
-      }
-      break;
-    }
-    let end=j;
-    // Trim non-phone characters at edges while retaining +.
-    while(end>start && /[\s\-\/._()]/.test(text[end-1])) end--;
-    while(start<end && /[\s\-\/._()]/.test(text[start])) start++;
-    const s=text.slice(start,end);
-    const score=candidateScore(s);
-    if(score>0){
-      // A candidate should not be embedded in a longer alphabetic word.
-      const before=text[start-1]||"", after=text[end]||"";
-      const goodBoundary = (!isLetter(before) && !isLetter(after)) ||
-                           (isLetter(after) && normalizeDigits(s).length>=8) ||
-                           (isLetter(before) && normalizeDigits(s).length>=8);
-      if(goodBoundary) out.push({start,end,text:s,score});
-    }
-    i=Math.max(i+1,end);
-  }
-  // Remove overlapping candidates; keep the one with more digits / better score.
-  out.sort((a,b)=>(b.score-a.score)||(b.end-b.start)-(a.end-a.start));
-  const chosen=[];
-  for(const c of out){
-    if(!chosen.some(x=>c.start<x.end && c.end>x.start)) chosen.push(c);
-  }
-  chosen.sort((a,b)=>a.start-b.start);
-  return chosen;
-}
+/*
+  A phone number may be split across several PDF text items.
+  We group text items into lines, then search each line and nearby
+  text for digit-heavy sequences.
+*/
+function buildLineItems(items){
+  const usable = [];
 
-function groupLineItems(items){
-  const sorted=items.filter(x=>x.str && x.str.trim()).map((x,idx)=>({...x,_idx:idx}));
-  sorted.sort((a,b)=>{
-    const ay=a.transform[5], by=b.transform[5];
-    if(Math.abs(ay-by)>3) return by-ay;
-    return a.transform[4]-b.transform[4];
+  for(const item of items){
+    if(!item || typeof item.str !== "string" || !item.str) continue;
+    if(!item.transform || item.transform.length < 6) continue;
+
+    const x = item.transform[4];
+    const y = item.transform[5];
+    const height = Math.abs(item.transform[3]) || Math.abs(item.height) || 10;
+
+    usable.push({
+      str:item.str,
+      x,
+      y,
+      height,
+      width: item.width || 0,
+      transform:item.transform,
+      fontName:item.fontName || ""
+    });
+  }
+
+  usable.sort((a,b) => {
+    const dy = Math.abs(a.y - b.y);
+    if(dy > Math.max(a.height,b.height) * .45) return b.y - a.y;
+    return a.x - b.x;
   });
-  const lines=[];
-  for(const item of sorted){
-    const y=item.transform[5];
-    let line=lines.find(l=>Math.abs(l.y-y)<=3);
-    if(!line){line={y,items:[]};lines.push(line)}
-    line.items.push(item);
-  }
-  for(const line of lines){
-    line.items.sort((a,b)=>a.transform[4]-b.transform[4]);
-    line.text="";
-    line.charMap=[];
-    for(const item of line.items){
-      const gap = line.text && item.transform[4] >
-        (line.items[line.items.indexOf(item)-1].transform[4] +
-         line.items[line.items.indexOf(item)-1].width*line.items[line.items.indexOf(item)-1].transform[0])
-        ? " " : "";
-      line.text += gap + item.str;
+
+  const lines = [];
+
+  for(const item of usable){
+    let line = null;
+
+    for(const candidate of lines){
+      const tolerance = Math.max(candidate.height, item.height) * .55;
+      if(Math.abs(candidate.y - item.y) <= tolerance){
+        line = candidate;
+        break;
+      }
     }
+
+    if(!line){
+      line = {
+        y:item.y,
+        height:item.height,
+        items:[]
+      };
+      lines.push(line);
+    }
+
+    line.items.push(item);
+    line.height = Math.max(line.height, item.height);
   }
+
+  for(const line of lines){
+    line.items.sort((a,b) => a.x - b.x);
+    line.text = line.items.map(x => x.str).join(" ");
+  }
+
+  lines.sort((a,b) => b.y - a.y);
   return lines;
 }
 
-function buildLineWithPositions(items){
-  const arr=[];
-  let text="";
-  let prevRight=null;
-  for(const item of items){
-    const x=item.transform[4], y=item.transform[5];
-    const fontSize=Math.abs(item.transform[3]) || Math.abs(item.transform[0]) || 12;
-    const width=Math.abs(item.width || (item.str.length*fontSize*.5));
-    const right=x+width;
-    let gap="";
-    if(text && prevRight!==null && x-prevRight>fontSize*.25) gap=" ";
-    const start=text.length;
-    text += gap + item.str;
-    const end=text.length;
-    arr.push({item,start,end,x,y,width,height:fontSize,gap});
-    prevRight=right;
+function findCandidatesInText(text, lineIndex){
+  const candidates = [];
+  const normalized = normalizeDigits(text);
+
+  /*
+    Candidate can contain:
+    digits + separators + a small amount of letters.
+    This intentionally supports unusual formats without considering
+    an entire normal sentence a phone number.
+  */
+  const re = /[+]?[\d０-９٠-٩۰-۹A-Za-z][\d０-９٠-٩۰-۹A-Za-z+()._\/\-\s]{5,}[\d０-９٠-٩۰-۹]/g;
+
+  let m;
+  while((m = re.exec(normalized))){
+    const raw = m[0].replace(/\s+/g," ").trim();
+    const score = numberScore(raw, text);
+
+    if(score >= 5){
+      candidates.push({
+        text:raw,
+        start:m.index,
+        end:m.index + m[0].length,
+        score,
+        lineIndex
+      });
+    }
   }
-  return {text,arr};
+
+  /*
+    Also detect compact digit sequences when PDF text extraction has
+    removed separators.
+  */
+  const compact = /\d{7,18}/g;
+  while((m = compact.exec(normalized))){
+    const raw = m[0];
+    const score = numberScore(raw, text);
+    if(score >= 5){
+      candidates.push({
+        text:raw,
+        start:m.index,
+        end:m.index + raw.length,
+        score,
+        lineIndex
+      });
+    }
+  }
+
+  return mergeOverlappingCandidates(candidates);
 }
 
-function rectForCandidate(line,c){
-  const hits=line.arr.filter(a=>a.end>c.start && a.start<c.end);
-  if(!hits.length) return null;
-  const first=hits[0], last=hits[hits.length-1];
-  const left=first.x;
-  const right=last.x+last.width;
-  const top=Math.min(...hits.map(h=>h.y));
-  const fs=Math.max(...hits.map(h=>h.height));
-  return {x:left,y:top-fs*.28,w:Math.max(2,right-left),h:fs*1.25,fontSize:fs,items:hits};
-}
+function mergeOverlappingCandidates(list){
+  if(!list.length) return [];
 
-async function scanPdf(){
-  if(!state.bytes)return;
-  $("scanBtn").disabled=true;
-  setStatus("Loading PDF and scanning every page...");
-  setProgress(0);
-  try{
-    state.pdf=await pdfjsLib.getDocument({data:state.bytes.slice()}).promise;
-    state.pages=[]; state.found=[];
-    for(let pno=1;pno<=state.pdf.numPages;pno++){
-      const page=await state.pdf.getPage(pno);
-      const content=await page.getTextContent({disableCombineTextItems:false});
-      const lines=groupLineItems(content.items);
-      const pageInfo={page,viewport:page.getViewport({scale:1}),lines};
-      state.pages.push(pageInfo);
+  list.sort((a,b) => {
+    if(a.start !== b.start) return a.start - b.start;
+    return (b.end-b.start) - (a.end-a.start);
+  });
 
-      for(const rawLine of lines){
-        const line=buildLineWithPositions(rawLine.items);
-        const candidates=findCandidatesInLine(line.text);
-        for(const c of candidates){
-          const rect=rectForCandidate(line,c);
-          if(!rect)continue;
-          state.found.push({
-            page:pno, original:c.text, digits:normalizeDigits(c.text),
-            rect, lineText:line.text
-          });
-        }
+  const out = [];
+
+  for(const c of list){
+    const last = out[out.length-1];
+
+    if(!last){
+      out.push(c);
+      continue;
+    }
+
+    if(c.start <= last.end){
+      if(c.score > last.score || (c.end-c.start) > (last.end-last.start)){
+        out[out.length-1] = c;
       }
-      setProgress(pno/state.pdf.numPages*100);
-      await sleep0();
-    }
-    renderResults();
-    if(state.found.length){
-      $("replaceBtn").disabled=false;
-      setStatus(`Found ${state.found.length} number occurrence(s) across ${state.pdf.numPages} page(s). Enter your normal number and click “Replace ALL & Prepare PDF”.`);
     }else{
-      setStatus("No phone-number-like text was found. Scanned/image-only PDFs need OCR, which is not enabled in this fast text mode.","warn");
-    }
-  }catch(err){
-    console.error(err);
-    setStatus("Could not read the PDF: "+(err.message||err),"warn");
-  }finally{
-    $("scanBtn").disabled=false;
-  }
-}
-
-function renderResults(){
-  $("resultsCard").classList.remove("hidden");
-  $("countBadge").textContent=state.found.length+" found";
-  if(!state.found.length){$("results").innerHTML="<p>No candidates found.</p>";return}
-  const counts=new Map();
-  for(const f of state.found) counts.set(f.original,(counts.get(f.original)||0)+1);
-  let html="<table><thead><tr><th>Page</th><th>Found in PDF</th><th>Occurrences</th></tr></thead><tbody>";
-  for(const [s,n] of counts){
-    const pages=[...new Set(state.found.filter(x=>x.original===s).map(x=>x.page))].join(", ");
-    html+=`<tr><td>${pages}</td><td class="mono">${escapeHtml(s)}</td><td>${n}</td></tr>`;
-  }
-  html+="</tbody></table>";
-  $("results").innerHTML=html;
-}
-
-function escapeHtml(s){
-  return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-}
-
-function splitFormat(original){
-  const digitSlots=[];
-  for(let i=0;i<original.length;i++) if(isDigit(original[i])) digitSlots.push(i);
-  return digitSlots;
-}
-
-function formatLikeOriginal(original,newNumber){
-  const srcDigits=normalizeDigits(original);
-  const dstDigits=normalizeDigits(newNumber);
-  if(!dstDigits) return null;
-
-  // Preserve the exact non-digit characters and put the new digits into
-  // the original digit positions. If digit counts differ, repeat the
-  // last digit / truncate only as needed to keep the original layout.
-  const slots=splitFormat(original);
-  let di=0, out="";
-  for(const ch of original){
-    if(isDigit(ch)){
-      out += dstDigits[Math.min(di,dstDigits.length-1)];
-      di++;
-    }else{
-      out += ch;
+      out.push(c);
     }
   }
+
   return out;
 }
 
-function inferFont(item){
-  const name=(item?.fontName||"").toLowerCase();
-  if(name.includes("courier")) return "monospace";
-  if(name.includes("times")) return "serif";
-  return "Arial";
+/*
+  Map candidate character positions back to PDF text items.
+  This allows us to calculate the exact visual rectangle that covers
+  the old number.
+*/
+function candidateGeometry(line, candidate){
+  const fullText = line.items.map(x => x.str).join(" ");
+  const start = candidate.start;
+  const end = candidate.end;
+
+  let cursor = 0;
+  const selected = [];
+
+  for(const item of line.items){
+    const itemStart = cursor;
+    const itemEnd = cursor + item.str.length;
+
+    if(itemEnd >= start && itemStart <= end){
+      selected.push(item);
+    }
+
+    cursor = itemEnd + 1; // joined with one space
+  }
+
+  if(!selected.length) return null;
+
+  const x1 = Math.min(...selected.map(x => x.x));
+  const x2 = Math.max(...selected.map(x => x.x + x.width));
+  const yTop = Math.max(...selected.map(x => x.y));
+  const height = Math.max(...selected.map(x => x.height));
+
+  return {
+    x:x1,
+    y:yTop - height * .25,
+    width:Math.max(1, x2-x1),
+    height:Math.max(1, height * 1.35),
+    fontName:selected[0].fontName || "",
+    fontSize:height || 10
+  };
 }
 
-function estimateInk(ctx,x,y,w,h){
-  // Most PDF documents have a white/light background. Sample a thin
-  // neighborhood around the number and choose the darkest frequent tone.
-  const pad=Math.max(2,Math.round(h*.35));
-  const sx=Math.max(0,Math.floor(x-pad)), sy=Math.max(0,Math.floor(y-pad));
-  const ex=Math.min(ctx.canvas.width,Math.ceil(x+w+pad));
-  const ey=Math.min(ctx.canvas.height,Math.ceil(y+h+pad));
-  if(ex<=sx||ey<=sy)return "#ffffff";
-  const d=ctx.getImageData(sx,sy,ex-sx,ey-sy).data;
-  let sumR=0,sumG=0,sumB=0,n=0;
-  // Sample only border pixels so we mostly sample background.
-  for(let yy=0;yy<ey-sy;yy+=Math.max(1,Math.floor(h/3))){
-    for(let xx=0;xx<ex-sx;xx+=Math.max(1,Math.floor(w/6))){
-      const border=yy<pad || yy>(ey-sy-pad) || xx<pad || xx>(ex-sx-pad);
-      if(!border)continue;
-      const k=(yy*(ex-sx)+xx)*4;
-      sumR+=d[k];sumG+=d[k+1];sumB+=d[k+2];n++;
+/*
+  Format a normal user number using the exact non-digit pattern
+  of the found PDF number.
+*/
+function formatLikeFound(foundText, userNumber){
+  const source = String(foundText || "");
+  const newDigits = digitsOnly(userNumber);
+
+  if(!newDigits) return source;
+
+  const digitPositions = [];
+  for(let i=0;i<source.length;i++){
+    if(isDigitChar(source[i])) digitPositions.push(i);
+  }
+
+  if(!digitPositions.length) return source;
+
+  /*
+    If counts are equal, this is a direct one-to-one replacement.
+    This gives the most faithful result.
+  */
+  if(newDigits.length === digitPositions.length){
+    let chars = source.split("");
+    for(let i=0;i<digitPositions.length;i++){
+      chars[digitPositions[i]] = newDigits[i];
+    }
+    return chars.join("");
+  }
+
+  /*
+    Counts differ:
+    preserve every non-digit separator exactly and distribute the
+    user's digits through the existing digit slots. Extra digits are
+    appended at the end, missing digits are removed from the last slots.
+  */
+  const slots = digitPositions.length;
+  let result = "";
+  let di = 0;
+
+  for(let i=0;i<source.length;i++){
+    const ch = source[i];
+
+    if(isDigitChar(ch)){
+      if(di < newDigits.length){
+        result += newDigits[di++];
+      }
+    }else{
+      result += ch;
     }
   }
-  if(!n)return "#ffffff";
-  const r=Math.round(sumR/n),g=Math.round(sumG/n),b=Math.round(sumB/n);
-  return `rgb(${r},${g},${b})`;
-}
 
-function drawReplacement(ctx, f, scale){
-  const r=f.rect;
-  const newText=formatLikeOriginal(f.original,$("newNumber").value.trim());
-  if(!newText) return;
-
-  const x=r.x*scale;
-  const y=(f.pageHeight-r.y-r.h)*scale;
-  const w=Math.max(r.w*scale+5*scale, 10*scale);
-  const h=Math.max(r.h*scale+3*scale, 10*scale);
-
-  // Cover the old visual text.
-  ctx.fillStyle=estimateInk(ctx,x,y,w,h);
-  ctx.fillRect(x-1*scale,y-1*scale,w+2*scale,h+2*scale);
-
-  const fs=Math.max(6,r.fontSize)*scale;
-  ctx.font=`${fs}px ${f.fontFamily||"Arial"}`;
-  ctx.textBaseline="alphabetic";
-  ctx.fillStyle="#000";
-
-  // Align approximately to the original baseline.
-  ctx.fillText(newText,x,(f.pageHeight-r.rect.y-r.rect.h*.18)*scale);
-}
-
-async function replaceAll(){
-  const normal=$("newNumber").value.trim();
-  if(!normal || normalizeDigits(normal).length<7){
-    setStatus("Enter a normal phone number with at least 7 digits.","warn"); return;
+  if(di < newDigits.length){
+    result += newDigits.slice(di);
   }
-  if(!state.pdf || !state.found.length){
-    setStatus("Find numbers first.","warn"); return;
+
+  return result;
+}
+
+/*
+  Estimate the text color from a small patch around the original
+  text. For normal PDFs, black/dark text on white backgrounds works
+  very well. For colored text we use the sampled dark pixels.
+*/
+function estimateTextColor(ctx, x, y, w, h){
+  try{
+    const sx = Math.max(0, Math.floor(x));
+    const sy = Math.max(0, Math.floor(y));
+    const sw = Math.max(1, Math.min(ctx.canvas.width-sx, Math.ceil(w)));
+    const sh = Math.max(1, Math.min(ctx.canvas.height-sy, Math.ceil(h)));
+
+    const data = ctx.getImageData(sx,sy,sw,sh).data;
+
+    let r=0,g=0,b=0,n=0;
+
+    for(let i=0;i<data.length;i+=4){
+      const rr=data[i], gg=data[i+1], bb=data[i+2], aa=data[i+3];
+
+      if(aa < 100) continue;
+
+      // Dark-ish pixels are more likely to belong to text.
+      const brightness=(rr+gg+bb)/3;
+      if(brightness < 180){
+        r+=rr; g+=gg; b+=bb; n++;
+      }
+    }
+
+    if(n){
+      return `rgb(${Math.round(r/n)},${Math.round(g/n)},${Math.round(b/n)})`;
+    }
+  }catch(e){}
+
+  return "#111111";
+}
+
+function cleanFontFamily(fontName){
+  const f=String(fontName||"").toLowerCase();
+
+  if(f.includes("courier")) return "Courier New, Courier, monospace";
+  if(f.includes("times")) return "Times New Roman, Times, serif";
+  if(f.includes("helvetica")) return "Arial, Helvetica, sans-serif";
+  if(f.includes("arial")) return "Arial, Helvetica, sans-serif";
+  if(f.includes("calibri")) return "Calibri, Arial, sans-serif";
+  if(f.includes("verdana")) return "Verdana, Arial, sans-serif";
+
+  return "Arial, Helvetica, sans-serif";
+}
+
+/*
+  Draw replacement inside the original rectangle.
+  The font is automatically reduced if needed so the replacement
+  stays inside the original number area.
+*/
+function drawReplacement(ctx, replacement, rect, color){
+  ctx.save();
+
+  const padX = Math.max(1, rect.height * .05);
+  const maxW = Math.max(2, rect.width - padX*2);
+
+  let fontSize = Math.max(5, rect.fontSize * 0.98);
+  const family = cleanFontFamily(rect.fontName);
+
+  ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = color;
+
+  function setFont(size){
+    ctx.font = `${size}px ${family}`;
+  }
+
+  setFont(fontSize);
+
+  let measured = ctx.measureText(replacement).width;
+
+  while(measured > maxW && fontSize > 4){
+    fontSize -= .25;
+    setFont(fontSize);
+    measured = ctx.measureText(replacement).width;
+  }
+
+  // If the replacement is still too wide, compress horizontally.
+  const scaleX = Math.min(1, maxW / Math.max(1, measured));
+
+  const baseline = rect.y + rect.height * .82;
+
+  ctx.translate(rect.x + padX, baseline);
+
+  if(scaleX < .995){
+    ctx.scale(scaleX,1);
+  }
+
+  ctx.fillText(replacement,0,0);
+
+  ctx.restore();
+}
+
+/*
+  Paint the old number area using the surrounding background.
+  For ordinary white PDF backgrounds, this is clean and leaves no
+  old text behind in the rendered output.
+*/
+function eraseArea(ctx, rect){
+  const x=Math.max(0, Math.floor(rect.x-2));
+  const y=Math.max(0, Math.floor(rect.y-2));
+  const w=Math.min(ctx.canvas.width-x, Math.ceil(rect.width+4));
+  const h=Math.min(ctx.canvas.height-y, Math.ceil(rect.height+4));
+
+  if(w<=0 || h<=0) return;
+
+  /*
+    Sample corner/edge pixels and use the median-ish light background.
+    This avoids making the area bright white when the PDF has a
+    light gray background.
+  */
+  const samples=[];
+
+  const pts=[
+    [x,y],
+    [Math.min(ctx.canvas.width-1,x+w-1),y],
+    [x,Math.min(ctx.canvas.height-1,y+h-1)],
+    [Math.min(ctx.canvas.width-1,x+w-1),Math.min(ctx.canvas.height-1,y+h-1)]
+  ];
+
+  for(const [px,py] of pts){
+    try{
+      const d=ctx.getImageData(px,py,1,1).data;
+      samples.push([d[0],d[1],d[2],d[3]]);
+    }catch(e){}
+  }
+
+  let r=255,g=255,b=255,a=255;
+
+  if(samples.length){
+    r=Math.round(samples.reduce((s,v)=>s+v[0],0)/samples.length);
+    g=Math.round(samples.reduce((s,v)=>s+v[1],0)/samples.length);
+    b=Math.round(samples.reduce((s,v)=>s+v[2],0)/samples.length);
+    a=Math.round(samples.reduce((s,v)=>s+v[3],0)/samples.length);
+  }
+
+  ctx.fillStyle=`rgba(${r},${g},${b},${a/255})`;
+  ctx.fillRect(x,y,w,h);
+}
+
+/* -----------------------------
+   PDF loading / detection
+----------------------------- */
+
+async function loadPdf(file){
+  sourceFile=file;
+  sourceBytes=new Uint8Array(await file.arrayBuffer());
+
+  $("fileInfo").classList.remove("hidden");
+  $("fileInfo").textContent =
+    `File: ${file.name}\nSize: ${(file.size/1024/1024).toFixed(2)} MB`;
+
+  setStatus("Reading PDF...",0);
+  $("progressWrap").classList.remove("hidden");
+
+  const loadingTask=pdfjsLib.getDocument({data:sourceBytes});
+  sourcePdf=await loadingTask.promise;
+
+  pageData=[];
+  foundNumbers=[];
+
+  for(let pageNo=1; pageNo<=sourcePdf.numPages; pageNo++){
+    setStatus(`Scanning page ${pageNo} / ${sourcePdf.numPages}...`,
+              ((pageNo-1)/sourcePdf.numPages)*100);
+
+    const page=await sourcePdf.getPage(pageNo);
+    const content=await page.getTextContent();
+    const viewport=page.getViewport({scale:1});
+
+    const lines=buildLineItems(content.items);
+    const pageFound=[];
+
+    for(let li=0;li<lines.length;li++){
+      const line=lines[li];
+
+      // Search the line itself.
+      let candidates=findCandidatesInText(line.text,li);
+
+      // If a phone number is split across adjacent lines/items,
+      // search a small merged neighborhood as well.
+      const neighborhoods=[line.text];
+
+      if(li>0) neighborhoods.push(lines[li-1].text+" "+line.text);
+      if(li+1<lines.length) neighborhoods.push(line.text+" "+lines[li+1].text);
+
+      for(const text of neighborhoods){
+        candidates=candidates.concat(findCandidatesInText(text,li));
+      }
+
+      candidates=mergeOverlappingCandidates(candidates);
+
+      for(const c of candidates){
+        // Re-find in the actual line where possible.
+        const geometry=candidateGeometry(line,c);
+
+        if(!geometry) continue;
+
+        const duplicate=pageFound.some(x =>
+          Math.abs(x.rect.x-geometry.x)<2 &&
+          Math.abs(x.rect.y-geometry.y)<3 &&
+          Math.abs(x.rect.width-geometry.width)<4 &&
+          x.text===c.text
+        );
+
+        if(duplicate) continue;
+
+        const item={
+          id:`p${pageNo}_${pageFound.length}`,
+          page:pageNo,
+          text:c.text,
+          digits:digitsOnly(c.text),
+          digitCount:countDigits(c.text),
+          score:c.score,
+          rect:geometry
+        };
+
+        pageFound.push(item);
+        foundNumbers.push(item);
+      }
+    }
+
+    pageData.push({
+      pageNo,
+      width:viewport.width,
+      height:viewport.height,
+      found:pageFound
+    });
+
+    await sleep(0);
+  }
+
+  setStatus(
+    `Scan complete. Found ${foundNumbers.length} phone-number occurrence(s) on ${sourcePdf.numPages} page(s).`,
+    100
+  );
+
+  renderFoundTable();
+
+  $("replaceCard").classList.remove("hidden");
+  $("foundCard").classList.remove("hidden");
+}
+
+/* -----------------------------
+   UI table
+----------------------------- */
+
+function renderFoundTable(){
+  const counts=new Map();
+
+  for(const item of foundNumbers){
+    counts.set(item.text,(counts.get(item.text)||0)+1);
+  }
+
+  $("summary").innerHTML =
+    `<span class="badge">${foundNumbers.length} occurrence(s)</span>
+     &nbsp; <span class="badge">${counts.size} unique format(s)</span>`;
+
+  if(!foundNumbers.length){
+    $("foundTable").innerHTML =
+      `<p class="warn">No phone numbers were detected in the PDF text layer.</p>
+       <p class="small">If this is a scanned/image-only PDF, OCR support is required.</p>`;
+    return;
+  }
+
+  let html=`<table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Page</th>
+        <th>Found in PDF</th>
+        <th>Digits</th>
+        <th>Count</th>
+      </tr>
+    </thead><tbody>`;
+
+  const countsObj=Object.fromEntries(counts);
+
+  foundNumbers.forEach((item,i)=>{
+    html+=`<tr>
+      <td>${i+1}</td>
+      <td>${item.page}</td>
+      <td><code>${escapeHtml(item.text)}</code></td>
+      <td>${item.digitCount}</td>
+      <td>${countsObj[item.text]}</td>
+    </tr>`;
+  });
+
+  html+=`</tbody></table>`;
+  $("foundTable").innerHTML=html;
+}
+
+/* -----------------------------
+   Replacement / output
+----------------------------- */
+
+async function replaceAllNumbers(){
+  if(!sourceBytes || !sourcePdf){
+    alert("Please upload a PDF first.");
+    return;
+  }
+
+  if(!foundNumbers.length){
+    alert("No phone numbers were found.");
+    return;
+  }
+
+  const userNumber=$("newNumber").value.trim();
+  const newDigits=digitsOnly(userNumber);
+
+  if(newDigits.length < 7){
+    alert("Please enter a valid phone number with at least 7 digits.");
+    $("newNumber").focus();
+    return;
   }
 
   $("replaceBtn").disabled=true;
-  $("scanBtn").disabled=true;
-  $("downloadCard").classList.add("hidden");
-  setStatus("Replacing all numbers and rebuilding each page at its original PDF size...");
-  setProgress(0);
+  $("resetBtn").disabled=true;
+  $("progressWrap").classList.remove("hidden");
+  $("resultCard").classList.add("hidden");
 
   try{
-    const out=await PDFLib.PDFDocument.create();
+    /*
+      Important:
+      We render each page at a fixed quality scale, but the output
+      PDF page dimensions are ALWAYS the original PDF dimensions.
+      Therefore a 612x792pt page remains 612x792pt regardless of
+      the canvas pixel size.
+    */
+    const RENDER_SCALE=2.0;
 
-    for(let pno=1;pno<=state.pdf.numPages;pno++){
-      const page=await state.pdf.getPage(pno);
-      const originalViewport=page.getViewport({scale:1});
-      const scale=1.6;
-      const viewport=page.getViewport({scale});
+    const outPdf=await PDFDocument.create();
+
+    for(let pageIndex=0; pageIndex<pageData.length; pageIndex++){
+      const pd=pageData[pageIndex];
+
+      setStatus(
+        `Replacing numbers on page ${pd.pageNo} / ${pageData.length}...`,
+        (pageIndex/pageData.length)*100
+      );
+
+      const page=await sourcePdf.getPage(pd.pageNo);
+
+      const viewport=page.getViewport({scale:RENDER_SCALE});
+
       const canvas=document.createElement("canvas");
       canvas.width=Math.ceil(viewport.width);
       canvas.height=Math.ceil(viewport.height);
+
       const ctx=canvas.getContext("2d",{alpha:false});
-      ctx.fillStyle="#fff";
+      ctx.fillStyle="#ffffff";
       ctx.fillRect(0,0,canvas.width,canvas.height);
 
-      await page.render({canvasContext:ctx,viewport}).promise;
+      await page.render({
+        canvasContext:ctx,
+        viewport
+      }).promise;
 
-      const pageFinds=state.found.filter(f=>f.page===pno);
-      for(const f of pageFinds){
-        f.pageHeight=originalViewport.height;
-        const firstItem=f.rect.items?.[0]?.item;
-        f.fontFamily=inferFont(firstItem);
-        drawReplacement(ctx,f,scale);
+      /*
+        PDF.js text coordinates are in PDF points. Canvas is scaled
+        by RENDER_SCALE, so every replacement rectangle is scaled too.
+      */
+      const pageFound=pd.found.slice();
+
+      for(const item of pageFound){
+        const replacement=formatLikeFound(item.text,userNumber);
+
+        const r={
+          x:item.rect.x*RENDER_SCALE,
+          y:(pd.height-(item.rect.y+item.rect.height))*RENDER_SCALE,
+          width:item.rect.width*RENDER_SCALE,
+          height:item.rect.height*RENDER_SCALE,
+          fontName:item.rect.fontName,
+          fontSize:item.rect.fontSize*RENDER_SCALE
+        };
+
+        // Save text color before erasing.
+        const textColor=estimateTextColor(
+          ctx,
+          Math.max(0,r.x-2),
+          Math.max(0,r.y-2),
+          Math.max(2,r.width+4),
+          Math.max(2,r.height+4)
+        );
+
+        eraseArea(ctx,r);
+        drawReplacement(ctx,replacement,r,textColor);
       }
 
-      const png=await new Promise(resolve=>canvas.toBlob(resolve,"image/png"));
-      const pngBytes=new Uint8Array(await png.arrayBuffer());
-      const image=await out.embedPng(pngBytes);
+      /*
+        PNG preserves the rendered page without JPEG compression.
+        The image itself is inserted at ORIGINAL PDF dimensions.
+      */
+      const pngData=canvas.toDataURL("image/png");
+      const pngBytes=dataUrlToUint8Array(pngData);
+      const png=await outPdf.embedPng(pngBytes);
 
-      // IMPORTANT: use the original PDF page dimensions in points.
-      const outPage=out.addPage([originalViewport.width,originalViewport.height]);
-      outPage.drawImage(image,{
-        x:0,y:0,
-        width:originalViewport.width,
-        height:originalViewport.height
+      // CRITICAL: original page dimensions, NOT canvas dimensions.
+      const outPage=outPdf.addPage([pd.width,pd.height]);
+
+      outPage.drawImage(png,{
+        x:0,
+        y:0,
+        width:pd.width,
+        height:pd.height
       });
 
-      setProgress(pno/state.pdf.numPages*100);
-      setStatus(`Replacing page ${pno} of ${state.pdf.numPages}...`);
-      await sleep0();
+      canvas.width=1;
+      canvas.height=1;
+
+      await sleep(0);
     }
 
-    state.outputBytes=await out.save({useObjectStreams:true});
-    $("downloadCard").classList.remove("hidden");
-    $("doneText").textContent=`All ${state.found.length} detected occurrence(s) were replaced. Original PDF page sizes were preserved.`;
-    setStatus("Done. The final PDF is ready to download.","ok");
-  }catch(err){
-    console.error(err);
-    setStatus("Replacement failed: "+(err.message||err),"warn");
+    setStatus("All numbers replaced. Creating final PDF...",99);
+
+    outputBytes=await outPdf.save({
+      useObjectStreams:true,
+      addDefaultPage:false
+    });
+
+    setStatus("Complete — all detected numbers have been replaced.",100);
+
+    const originalBase=sourceFile.name.replace(/\.pdf$/i,"");
+    $("resultText").innerHTML =
+      `<span class="ok">✓ Replacement completed</span><br><br>
+       ${foundNumbers.length} number occurrence(s) replaced.<br>
+       Original page dimensions preserved.<br>
+       Output: <b>${escapeHtml(originalBase)}-replaced.pdf</b>`;
+
+    $("resultCard").classList.remove("hidden");
+
+    await showPreview(outputBytes);
+
+  }catch(error){
+    console.error(error);
+
+    setStatus("Error: "+(error.message || error),0);
+
+    $("resultText").innerHTML =
+      `<span class="err">Replacement failed.</span><br><br>
+       ${escapeHtml(error.message || String(error))}`;
+
+    $("resultCard").classList.remove("hidden");
+
   }finally{
     $("replaceBtn").disabled=false;
-    $("scanBtn").disabled=false;
+    $("resetBtn").disabled=false;
   }
 }
 
-function downloadOutput(){
-  if(!state.outputBytes)return;
-  const old=state.file?.name || "document.pdf";
-  const base=old.replace(/\.pdf$/i,"");
-  const blob=new Blob([state.outputBytes],{type:"application/pdf"});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement("a");
-  a.href=url;a.download=base+"-replaced.pdf";
-  document.body.appendChild(a);a.click();a.remove();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
+function dataUrlToUint8Array(dataUrl){
+  const base64=dataUrl.split(",")[1];
+  const bin=atob(base64);
+  const bytes=new Uint8Array(bin.length);
+
+  for(let i=0;i<bin.length;i++){
+    bytes[i]=bin.charCodeAt(i);
+  }
+
+  return bytes;
 }
+
+/* -----------------------------
+   Preview
+----------------------------- */
+
+async function showPreview(bytes){
+  $("previewCard").classList.remove("hidden");
+  const box=$("preview");
+  box.innerHTML="";
+
+  try{
+    const pdf=await pdfjsLib.getDocument({data:bytes}).promise;
+    const max=Math.min(pdf.numPages,3);
+
+    for(let i=1;i<=max;i++){
+      const page=await pdf.getPage(i);
+      const viewport=page.getViewport({scale:1});
+
+      // Keep preview reasonably sized while preserving aspect ratio.
+      const maxWidth=900;
+      const scale=Math.min(1.2,maxWidth/viewport.width);
+      const vp=page.getViewport({scale});
+
+      const canvas=document.createElement("canvas");
+      canvas.width=Math.ceil(vp.width);
+      canvas.height=Math.ceil(vp.height);
+
+      await page.render({
+        canvasContext:canvas.getContext("2d"),
+        viewport:vp
+      }).promise;
+
+      box.appendChild(canvas);
+    }
+
+    if(pdf.numPages>3){
+      const note=document.createElement("div");
+      note.className="small";
+      note.textContent=`Preview shows first 3 of ${pdf.numPages} pages. Download contains all pages.`;
+      box.appendChild(note);
+    }
+  }catch(e){
+    box.innerHTML=`<span class="err">Preview unavailable: ${escapeHtml(e.message||e)}</span>`;
+  }
+}
+
+/* -----------------------------
+   Download
+----------------------------- */
+
+$("downloadBtn").addEventListener("click",()=>{
+  if(!outputBytes){
+    alert("The replaced PDF is not ready yet.");
+    return;
+  }
+
+  const base=sourceFile
+    ? sourceFile.name.replace(/\.pdf$/i,"")
+    : "document";
+
+  const blob=new Blob([outputBytes],{type:"application/pdf"});
+  const url=URL.createObjectURL(blob);
+
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=base+"-replaced.pdf";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(url),30000);
+});
+
+/* -----------------------------
+   Upload UI
+----------------------------- */
+
+$("drop").addEventListener("click",()=>{
+  $("fileInput").click();
+});
+
+$("fileInput").addEventListener("change",async e=>{
+  const file=e.target.files[0];
+  if(file) await handleFile(file);
+});
+
+$("drop").addEventListener("dragover",e=>{
+  e.preventDefault();
+  $("drop").classList.add("drag");
+});
+
+$("drop").addEventListener("dragleave",()=>{
+  $("drop").classList.remove("drag");
+});
+
+$("drop").addEventListener("drop",async e=>{
+  e.preventDefault();
+  $("drop").classList.remove("drag");
+
+  const file=e.dataTransfer.files[0];
+
+  if(file && (file.type==="application/pdf" || /\.pdf$/i.test(file.name))){
+    await handleFile(file);
+  }else{
+    alert("Please drop a PDF file.");
+  }
+});
+
+async function handleFile(file){
+  $("foundCard").classList.add("hidden");
+  $("replaceCard").classList.add("hidden");
+  $("resultCard").classList.add("hidden");
+  $("previewCard").classList.add("hidden");
+  $("preview").innerHTML="";
+  outputBytes=null;
+
+  try{
+    await loadPdf(file);
+  }catch(error){
+    console.error(error);
+    $("progressWrap").classList.remove("hidden");
+    setStatus("Could not read PDF: "+(error.message||error),0);
+    $("foundCard").classList.remove("hidden");
+  }
+}
+
+$("replaceBtn").addEventListener("click",replaceAllNumbers);
+
+$("resetBtn").addEventListener("click",()=>{
+  sourceFile=null;
+  sourceBytes=null;
+  sourcePdf=null;
+  pageData=[];
+  foundNumbers=[];
+  outputBytes=null;
+
+  $("fileInput").value="";
+  $("newNumber").value="";
+  $("fileInfo").classList.add("hidden");
+  $("foundCard").classList.add("hidden");
+  $("replaceCard").classList.add("hidden");
+  $("resultCard").classList.add("hidden");
+  $("previewCard").classList.add("hidden");
+  $("preview").innerHTML="";
+  $("progressWrap").classList.add("hidden");
+  $("bar").style.width="0";
+  $("status").textContent="Waiting...";
+});
+
 </script>
 </body>
 </html>
