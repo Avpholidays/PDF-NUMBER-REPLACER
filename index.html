@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PDF Number Analyzer & Replacer</title>
+<title>PDF Number Replacer</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
@@ -19,23 +19,23 @@ body{
 }
 
 .wrap{
-  max-width:1100px;
-  margin:28px auto;
-  padding:0 16px
+  max-width:1050px;
+  margin:24px auto;
+  padding:0 14px
 }
 
 .card{
   background:#fff;
   border:1px solid #e1e6ee;
-  border-radius:16px;
-  padding:20px;
-  margin-bottom:16px;
-  box-shadow:0 8px 25px rgba(20,35,60,.06)
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:14px;
+  box-shadow:0 5px 20px rgba(20,35,60,.05)
 }
 
 h1{
-  margin:0 0 7px;
-  font-size:27px
+  margin:0 0 6px;
+  font-size:25px
 }
 
 .sub,.muted,.small{
@@ -51,28 +51,28 @@ h1{
 
 .field{
   flex:1;
-  min-width:260px
+  min-width:250px
 }
 
 label{
   display:block;
   font-weight:700;
-  margin-bottom:7px
+  margin-bottom:6px
 }
 
 input[type=file],
 input[type=text]{
   width:100%;
-  padding:12px;
+  padding:11px;
   border:1px solid #cbd5e1;
-  border-radius:10px;
+  border-radius:9px;
   font-size:15px
 }
 
 button{
   border:0;
-  border-radius:10px;
-  padding:12px 16px;
+  border-radius:9px;
+  padding:11px 15px;
   font-weight:700;
   cursor:pointer;
   background:#172033;
@@ -94,19 +94,19 @@ button:disabled{
 }
 
 .status{
-  padding:12px;
-  border-radius:10px;
+  margin-top:12px;
+  padding:11px;
+  border-radius:9px;
   background:#f2f4f7;
-  margin-top:14px;
   white-space:pre-wrap
 }
 
 .progress{
-  height:8px;
+  height:7px;
   background:#e5e7eb;
   border-radius:20px;
   overflow:hidden;
-  margin-top:12px;
+  margin-top:10px;
   display:none
 }
 
@@ -122,13 +122,13 @@ button:disabled{
 
 .summary{
   display:flex;
-  gap:9px;
+  gap:8px;
   flex-wrap:wrap;
-  margin-bottom:12px
+  margin:10px 0
 }
 
 .pill{
-  padding:7px 11px;
+  padding:6px 10px;
   border-radius:99px;
   background:#eef2f7;
   font-weight:700
@@ -155,7 +155,7 @@ table{
 
 th,td{
   text-align:left;
-  padding:10px;
+  padding:9px;
   border-bottom:1px solid #edf0f4;
   vertical-align:top
 }
@@ -174,9 +174,9 @@ code{
 }
 
 .box{
-  padding:13px;
-  border-radius:11px;
-  margin-top:12px
+  padding:11px;
+  border-radius:9px;
+  margin-top:10px
 }
 
 .warn{
@@ -200,78 +200,117 @@ code{
 <h1>PDF Number Analyzer & Replacer</h1>
 
 <p class="sub">
-Analyze phone-like numbers, unusual letters-mixed formats,
-and replace only confirmed formats while preserving their separators.
+Only confirmed phone-number areas are changed.
+The rest of every rendered PDF page is kept from the original page.
 </p>
 
 <label>Upload PDF</label>
 
-<input id="pdfFile" type="file" accept="application/pdf">
+<input
+id="pdfFile"
+type="file"
+accept="application/pdf"
+>
 
-<div class="row" style="margin-top:14px">
+<div class="row" style="margin-top:12px">
 
 <div class="field">
 
-<label>Your new number</label>
+<label>New number</label>
 
 <input
 id="newNumber"
 type="text"
-inputmode="tel"
-placeholder="+52-800-953-2863">
+placeholder="+52-800-953-2863"
+>
 
 </div>
 
-<button id="analyzeBtn" disabled>
+<button
+id="analyzeBtn"
+disabled
+>
 Analyze PDF
 </button>
 
-<button id="replaceBtn" class="success" disabled>
+<button
+id="replaceBtn"
+class="success"
+disabled
+>
 Replace ALL Confirmed
 </button>
 
-<button id="clearBtn" class="secondary">
+<button
+id="clearBtn"
+class="secondary"
+>
 Clear
 </button>
 
 </div>
 
-<div id="status" class="status">
+<div
+id="status"
+class="status"
+>
 Upload a PDF to begin.
 </div>
 
-<div id="progress" class="progress">
-<div id="bar" class="bar"></div>
+<div
+id="progress"
+class="progress"
+>
+<div
+id="bar"
+class="bar"
+></div>
 </div>
 
 </div>
 
 
-<div id="resultsCard" class="card hidden">
+<div
+id="resultsCard"
+class="card hidden"
+>
 
-<h2 style="margin:0 0 10px">
+<h2 style="margin:0 0 8px">
 Detected formats
 </h2>
 
 <div class="summary">
 
-<div id="validPill" class="pill green">
+<div
+id="validPill"
+class="pill green"
+>
 Valid: 0
 </div>
 
-<div id="suspiciousPill" class="pill yellow">
+<div
+id="suspiciousPill"
+class="pill yellow"
+>
 Suspicious: 0
 </div>
 
-<div id="occPill" class="pill">
+<div
+id="occPill"
+class="pill"
+>
 Occurrences: 0
 </div>
 
 </div>
 
-<div class="muted" style="margin-bottom:10px">
-Page numbers are not shown.
-Suspicious formats must be confirmed before replacement.
+<div
+class="muted"
+style="margin-bottom:9px"
+>
+Page numbers are not displayed.
+Normal formats are selected automatically;
+suspicious formats require confirmation.
 </div>
 
 <div class="table-wrap">
@@ -281,54 +320,57 @@ Suspicious formats must be confirmed before replacement.
 <thead>
 
 <tr>
-<th>Detected content</th>
-<th>Format / reason</th>
-<th>Found</th>
-<th>Replace</th>
+
+<th>
+Detected
+</th>
+
+<th>
+Format
+</th>
+
+<th>
+Found
+</th>
+
+<th>
+Replace
+</th>
+
 </tr>
 
 </thead>
 
-<tbody id="resultsBody"></tbody>
+<tbody id="resultsBody">
+</tbody>
 
 </table>
 
 </div>
 
-<div id="suspiciousHelp" class="box warn hidden">
-
-<b>
-⚠ Suspicious / possible phone-like content
-</b>
-
-<br>
-
-Examples such as
-
-<code>52-800-ABC-461-XYZ-1544</code>
-
-are shown here and are not replaced unless you confirm them.
-
-</div>
-
 </div>
 
 
-<div id="downloadCard" class="card hidden">
+<div
+id="downloadCard"
+class="card hidden"
+>
 
-<h2 style="margin:0 0 8px">
+<h2 style="margin:0 0 7px">
 Replacement complete
 </h2>
 
-<div id="downloadText" class="box ok"></div>
+<div
+id="downloadText"
+class="box ok"
+></div>
 
 <button
 id="downloadBtn"
 class="success"
-style="margin-top:12px">
-
+style="margin-top:10px"
+>
 ⬇ Download PDF
-
 </button>
 
 </div>
@@ -340,93 +382,125 @@ style="margin-top:12px">
 
 "use strict";
 
+
+/* PDF.js */
+
 pdfjsLib.GlobalWorkerOptions.workerSrc =
 "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 
-const $ = id => document.getElementById(id);
+/* State */
+
+const $ = id =>
+document.getElementById(id);
 
 
 const S = {
 
 file:null,
+
 bytes:null,
+
 pdf:null,
+
 groups:new Map(),
+
 selected:new Set(),
+
 out:null
 
 };
 
 
-function st(x){
+/* Helpers */
 
-$("status").textContent=x;
+function status(text){
+
+$("status").textContent = text;
 
 }
 
 
-function pg(x,on=true){
+function progress(value,on=true){
 
 $("progress").style.display =
 on ? "block" : "none";
 
 $("bar").style.width =
-Math.max(0,Math.min(100,x))+"%";
+Math.max(
+0,
+Math.min(
+100,
+value
+)
+)+"%";
 
 }
 
 
-function esc(s){
+function esc(text){
 
-return String(s).replace(
+return String(text).replace(
 /[&<>"']/g,
 c => ({
+
 "&":"&amp;",
+
 "<":"&lt;",
+
 ">":"&gt;",
-"\"":"&quot;",
+
+'"':"&quot;",
+
 "'":"&#39;"
+
 }[c])
+
 );
 
 }
 
 
-function nd(s){
+function digits(text){
 
-return String(s).replace(
-/\p{Nd}/gu,
-c => {
-
-let n=parseInt(c,10);
-
-return Number.isFinite(n)
-? String(n)
-: c;
-
-});
-
-}
-
-
-function dc(s){
-
-return (nd(s).match(/\d/g)||[]).length;
+return (
+String(text)
+.match(/\p{Nd}/gu)||[]
+)
+.map(
+c => parseInt(c,10)
+)
+.filter(
+Number.isFinite
+);
 
 }
 
 
-function dateLike(s){
+function digitCount(text){
 
-let t=nd(s).trim();
+return digits(text).length;
 
-let d=t.replace(/\D/g,"");
+}
+
+
+function dateLike(text){
+
+const t =
+String(text).trim();
+
+const d =
+t.replace(
+/\D/g,
+""
+);
 
 return (
 
-(d.length===4 &&
-/^(19|20)\d{2}$/.test(d))
+(
+d.length===4 &&
+/^(19|20)\d{2}$/.test(d)
+)
 
 ||
 
@@ -441,37 +515,37 @@ return (
 }
 
 
-function fmt(s){
+function formatOf(text){
 
-let a=nd(s);
-
-let g=a.match(/\d+/g)||[];
-
-let sep=a.split(/\d+/).filter(Boolean);
-
-let x=g.map(v=>"X".repeat(v.length))
-.join(sep[0]||"");
-
-return
-
-(/^[\s]*[+＋]/.test(s) ? "+" : "")
-+
-x
-+
-(/[A-Za-z\p{L}]/u.test(s) ? " + letters" : "");
+return String(text).replace(
+/\p{Nd}+/gu,
+m => "X".repeat(m.length)
+);
 
 }
 
+
+/*
+Phone separators.
+*/
 
 const SEP =
 " \\t\\-‐-‒–—−_/\\\\.·:;,|~*#()\\[\\]{}<>+=@";
 
 
-const normalRE = new RegExp(
+/*
+Normal phone-like pattern.
+*/
+
+const normalRE =
+new RegExp(
 
 "(?<![\\d\\p{L}])" +
+
 "(?:[+＋]?\\s*[\\d\\p{Nd}]{1,4})" +
+
 "(?:["+SEP+"]+[\\d\\p{Nd}]{1,8}){1,7}" +
+
 "(?![\\d\\p{L}])",
 
 "gu"
@@ -479,11 +553,20 @@ const normalRE = new RegExp(
 );
 
 
-const suspiciousRE = new RegExp(
+/*
+Suspicious number-like pattern
+containing letters.
+*/
+
+const suspiciousRE =
+new RegExp(
 
 "(?<![\\d\\p{L}])" +
-"(?:[+＋]?\\s*[A-Za-z\\p{L}\\p{Nd}]{1,18})" +
+
+"(?:[+＋]?[A-Za-z\\p{L}\\p{Nd}]{1,18})" +
+
 "(?:["+SEP+"]+[A-Za-z\\p{L}\\p{Nd}]{1,18}){2,7}" +
+
 "(?![\\d\\p{L}])",
 
 "gu"
@@ -491,251 +574,360 @@ const suspiciousRE = new RegExp(
 );
 
 
-function itemBox(it,viewport,styles){
+/*
+Get font information.
+*/
 
-if(
-!it ||
-!Array.isArray(it.transform) ||
-it.transform.length<6 ||
-!viewport
-)return null;
+function getCanvasFont(
+item,
+styles
+){
 
-
-const x=+it.transform[4];
-
-const y=+it.transform[5];
-
-
-const fs=Math.max(
-1,
-Math.hypot(
-+it.transform[2]||0,
-+it.transform[3]||10
-)
-);
-
-
-const w =
-Number.isFinite(+it.width)
-? Math.abs(+it.width)
-: 0;
-
-
-const h =
-Number.isFinite(+it.height) &&
-+it.height!==0
-? Math.abs(+it.height)
-: fs;
-
-
-const pt =
-viewport.convertToViewportPoint(x,y);
-
-
-if(
-!Number.isFinite(pt[0]) ||
-!Number.isFinite(pt[1])
-)return null;
-
-
-const style =
-styles && it.fontName
-? styles[it.fontName]
-: null;
+const st =
+styles &&
+item.fontName
+?
+styles[item.fontName]
+:
+null;
 
 
 const family =
-(style && style.fontFamily) ||
-"Arial, Helvetica, sans-serif";
+(st && st.fontFamily)
+||
+"Arial";
 
 
-let widths=[];
-
-
-try{
-
-const c =
-itemBox._canvas ||
-(itemBox._canvas=document.createElement("canvas"));
-
-
-const ctx=c.getContext("2d");
-
-
-ctx.font =
-`${Math.max(1,fs)}px ${family}`;
-
-
-for(const ch of it.str){
-
-widths.push(
+const size =
 Math.max(
-0,
-ctx.measureText(ch).width
+1,
+Math.hypot(
++item.transform[2]||0,
++item.transform[3]||10
 )
 );
-
-}
-
-}catch(e){
-
-widths=
-Array.from(
-it.str,
-()=>1
-);
-
-}
-
-
-let sum =
-widths.reduce(
-(a,b)=>a+b,
-0
-);
-
-
-if(!(sum>0))
-sum=it.str.length||1;
-
-
-const scale =
-w>0
-? w/sum
-: 0;
-
-
-const charX=[0];
-
-
-for(const z of widths){
-
-charX.push(
-charX[charX.length-1]+z*scale
-);
-
-}
 
 
 return {
 
-x:pt[0],
-y:pt[1],
-w,
-h,
-fs,
-font:it.fontName||"",
 family,
-charX,
-str:it.str
+
+size
 
 };
 
 }
 
 
-function lines(items,viewport,styles){
+/*
+Convert PDF.js text item
+into viewport coordinates.
 
-let a=[];
+IMPORTANT:
+The replacement process does NOT
+rebuild the original text.
+*/
 
-
-items.forEach((it,i)=>{
+function itemGeometry(
+item,
+viewport,
+styles
+){
 
 if(
-typeof it.str!=="string" ||
-!it.str
-)return;
+!item ||
+typeof item.str!=="string" ||
+!item.str ||
+!Array.isArray(item.transform)
+){
+
+return null;
+
+}
 
 
-let b =
-itemBox(
-it,
+const font =
+getCanvasFont(
+item,
+styles
+);
+
+
+const tx =
+pdfjsLib.Util.transform(
+viewport.transform,
+item.transform
+);
+
+
+const angle =
+Math.atan2(
+tx[1],
+tx[0]
+);
+
+
+const x =
+tx[4];
+
+
+const y =
+tx[5];
+
+
+const width =
+Math.abs(
+item.width||0
+)
+*
+viewport.scale;
+
+
+const height =
+Math.max(
+
+Math.abs(
+item.height||0
+)
+*
+viewport.scale,
+
+font.size*
+viewport.scale*
+.85
+
+);
+
+
+return {
+
+x,
+
+y,
+
+width,
+
+height,
+
+angle,
+
+fontSize:
+font.size*
+viewport.scale,
+
+family:
+font.family,
+
+str:
+item.str,
+
+item
+
+};
+
+}
+
+
+/*
+Group PDF text items into lines.
+*/
+
+function makeLines(
+items,
+viewport,
+styles
+){
+
+const a=[];
+
+
+for(
+let i=0;
+i<items.length;
+i++
+){
+
+const item =
+items[i];
+
+
+if(
+typeof item.str!=="string" ||
+!item.str
+){
+
+continue;
+
+}
+
+
+const geometry =
+itemGeometry(
+item,
 viewport,
 styles
 );
 
 
-if(b)
+if(geometry){
+
 a.push({
+
 i,
-str:it.str,
-b
-});
+
+str:item.str,
+
+g:geometry
 
 });
 
+}
+
+}
+
+
+/*
+Sort by vertical then horizontal position.
+*/
 
 a.sort(
-(x,y) =>
-Math.abs(x.b.y-y.b.y)<4
-?
-x.b.x-y.b.x
-:
-x.b.y-y.b.y
-);
+(p,q)=>{
+
+const py =
+p.g.y;
+
+const qy =
+q.g.y;
 
 
-let out=[];
-
-
-for(let q of a){
-
-let l =
-out.find(
-z =>
-Math.abs(z.y-q.b.y)
-<=
+if(
+Math.abs(py-qy)
+<
 Math.max(
-4,
-Math.min(
-12,
-q.b.h*.65
+3,
+p.g.height*.35
 )
+){
+
+return p.g.x-q.g.x;
+
+}
+
+
+return py-qy;
+
+});
+
+
+const out=[];
+
+
+for(
+const q of a
+){
+
+let line=null;
+
+
+const tolerance =
+Math.max(
+3,
+Math.min(
+10,
+q.g.height*.45
 )
 );
 
 
-if(!l){
+for(
+const existing of out
+){
 
-l={
-y:q.b.y,
-a:[]
+if(
+Math.abs(
+existing.y-q.g.y
+)
+<=
+tolerance
+){
+
+line=existing;
+
+break;
+
+}
+
+}
+
+
+if(!line){
+
+line={
+
+y:q.g.y,
+
+a:[],
+
+text:"",
+
+ranges:[]
+
 };
 
-out.push(l);
-
-}else{
-
-l.a.push(q);
-
-}
+out.push(line);
 
 }
 
 
-for(let l of out){
+line.a.push(q);
 
-l.a.sort(
-(x,y)=>x.b.x-y.b.x
+}
+
+
+/*
+Create the combined text for every line.
+*/
+
+for(
+const line of out
+){
+
+line.a.sort(
+(a,b)=>
+a.g.x-b.g.x
 );
 
-l.text="";
-l.r=[];
+
+let text="";
+
+line.ranges=[];
 
 
-for(let q of l.a){
+for(
+const q of line.a
+){
 
-let s=l.text.length;
+const start =
+text.length;
 
-l.text+=q.str;
 
-l.r.push({
-s,
-e:l.text.length,
+text+=q.str;
+
+
+line.ranges.push({
+
+s:start,
+
+e:text.length,
+
 q
+
 });
 
 }
+
+
+line.text=text;
 
 }
 
@@ -745,103 +937,144 @@ return out;
 }
 
 
-function substringBoxes(
+/*
+Find exact visual boxes for
+the detected substring.
+
+These boxes are saved during
+analysis so replacement does not
+recalculate coordinates later.
+*/
+
+function boxesForRange(
 line,
 start,
 end
 ){
 
-const out=[];
+const boxes=[];
 
 
-for(const r of line.r){
+for(
+const r of line.ranges
+){
 
-const os =
+const overlapStart =
 Math.max(
 start,
 r.s
 );
 
 
-const oe =
+const overlapEnd =
 Math.min(
 end,
 r.e
 );
 
 
-if(oe<=os)
+if(
+overlapEnd<=overlapStart
+){
+
 continue;
 
-
-const localS =
-os-r.s;
+}
 
 
-const localE =
-oe-r.s;
+const localStart =
+overlapStart-r.s;
 
 
-const b=r.q.b;
+const localEnd =
+overlapEnd-r.s;
 
 
-const x1 =
-b.x+
-(b.charX[localS]||0);
+const g =
+r.q.g;
 
 
-const x2 =
-b.x+
-(b.charX[localE]||b.w);
+/*
+PDF text item width divided by
+its character count.
 
+This gives the approximate
+horizontal location of only the
+detected characters.
+*/
 
-const left =
-Math.min(x1,x2);
-
-
-const width =
+const totalChars =
 Math.max(
-0.5,
-Math.abs(x2-x1)
+1,
+g.str.length
 );
 
 
-const top =
-b.y-
+const charWidth =
+g.width/totalChars;
+
+
+const x1 =
+g.x+
+charWidth*
+localStart;
+
+
+const x2 =
+g.x+
+charWidth*
+localEnd;
+
+
+boxes.push({
+
+x:Math.min(
+x1,
+x2
+),
+
+y:
+g.y-
+g.height*.88,
+
+w:
 Math.max(
-b.h,
-b.fs
-)*0.88;
+1,
+Math.abs(
+x2-x1
+)
+),
 
-
-const height =
+h:
 Math.max(
-b.h,
-b.fs
-)*1.05;
+2,
+g.height*1.12
+),
 
+fontSize:
+g.fontSize,
 
-out.push({
+family:
+g.family,
 
-x:left,
-y:top,
-w:width,
-h:height,
-fs:b.fs,
-font:b.font,
-family:b.family
+angle:
+g.angle
 
 });
 
 }
 
 
-return out;
+return boxes;
 
 }
 
 
-function add(
+/*
+Add detected candidate.
+*/
+
+function addCandidate(
 text,
 kind,
 line,
@@ -852,65 +1085,76 @@ end
 
 text=text.trim();
 
-let d=dc(text);
 
-
-if(d<7||d>15)
-return;
+const count =
+digitCount(text);
 
 
 if(
-kind==="normal" &&
+count<7 ||
+count>15 ||
 dateLike(text)
-)
+){
+
 return;
 
+}
 
-let g=
+
+let group =
 S.groups.get(text);
 
 
-if(!g){
+if(!group){
 
-g={
+group={
 
 text,
+
 kind,
+
 count:0,
 
-format:fmt(text),
+format:
+formatOf(text),
 
 reason:
-kind==="suspicious"
+kind==="normal"
+
 ?
-"Digits mixed with letters or unusual phone-like structure."
+"Numeric phone-like pattern."
+
 :
-"Numeric phone-like pattern.",
+"Letters mixed into a phone-like pattern.",
 
 occ:[]
 
 };
 
+
 S.groups.set(
 text,
-g
+group
 );
 
 }
 
 
-g.count++;
+group.count++;
 
 
-g.occ.push({
+group.occ.push({
 
 page,
+
 line,
+
 start,
+
 end,
 
 boxes:
-substringBoxes(
+boxesForRange(
 line,
 start,
 end
@@ -921,124 +1165,202 @@ end
 }
 
 
-function scan(
+/*
+Scan a text line.
+*/
+
+function scanLine(
 line,
 page
 ){
 
-let ranges=[];
+const normalRanges=[];
 
-let m;
+let match;
 
+
+/*
+Normal candidates.
+*/
 
 normalRE.lastIndex=0;
 
 
 while(
-(m=normalRE.exec(line.text))
+(match=normalRE.exec(
+line.text
+))
 ){
 
-let raw=m[0];
+const raw =
+match[0];
 
-let t=raw.trim();
+
+const text =
+raw.trim();
 
 
-const trimLeft =
+const leading =
 raw.search(/\S/);
 
 
-const s =
-m.index+
+const start =
+match.index+
 (
-trimLeft<0
-?0
-:trimLeft
+leading<0
+?
+0
+:
+leading
 );
 
 
-const e =
-s+t.length;
+const end =
+start+
+text.length;
 
 
 if(
-dc(t)>=7 &&
-dc(t)<=15 &&
-!dateLike(t)
+digitCount(text)>=7 &&
+digitCount(text)<=15 &&
+!dateLike(text)
 ){
 
-ranges.push({
-s,
-e
+normalRanges.push({
+
+s:start,
+
+e:end
+
 });
 
-add(
-t,
+
+addCandidate(
+
+text,
+
 "normal",
+
 line,
+
 page,
-s,
-e
+
+start,
+
+end
+
 );
 
 }
 
 }
 
+
+/*
+Suspicious candidates.
+*/
 
 suspiciousRE.lastIndex=0;
 
 
 while(
-(m=suspiciousRE.exec(line.text))
+(match=suspiciousRE.exec(
+line.text
+))
 ){
 
-let raw=m[0];
+const raw =
+match[0];
 
-let t=raw.trim();
+
+const text =
+raw.trim();
 
 
-const trimLeft =
+const leading =
 raw.search(/\S/);
 
 
-const s =
-m.index+
+const start =
+match.index+
 (
-trimLeft<0
-?0
-:trimLeft
+leading<0
+?
+0
+:
+leading
 );
 
 
-const e =
-s+t.length;
+const end =
+start+
+text.length;
 
 
 if(
-!/[A-Za-z\p{L}]/u.test(t) ||
-dc(t)<7 ||
-dc(t)>15
-)
+!/[A-Za-z\p{L}]/u.test(text) ||
+digitCount(text)<7 ||
+digitCount(text)>15
+){
+
 continue;
 
+}
+
+
+/*
+Do not duplicate a normal candidate.
+*/
 
 if(
-ranges.some(
+normalRanges.some(
 r =>
-s<r.e &&
-e>r.s
+start<r.e &&
+end>r.s
 )
-)
+){
+
 continue;
 
+}
 
-add(
-t,
+
+/*
+A clean number followed immediately
+by ordinary letters should not become
+one giant suspicious number.
+*/
+
+const cleanTail =
+text.match(
+/^(.+?\d)([A-Za-z\p{L}]+)$/u
+);
+
+
+if(
+cleanTail &&
+digitCount(cleanTail[1])>=7
+){
+
+continue;
+
+}
+
+
+addCandidate(
+
+text,
+
 "suspicious",
+
 line,
+
 page,
-s,
-e
+
+start,
+
+end
+
 );
 
 }
@@ -1046,401 +1368,17 @@ e
 }
 
 
-function analyzeLine(
-text,
-page,
-viewport,
-styles
-){
-
-let ls =
-lines(
-text,
-viewport,
-styles
-);
-
-for(let l of ls)
-scan(l,page);
-
-}
-
-
-function mapDigitStyle(
-d,
-template
-){
-
-const cp =
-template.codePointAt(0);
-
-
-if(
-cp>=0xFF10 &&
-cp<=0xFF19
-)
-return String.fromCodePoint(
-0xFF10+d
-);
-
-
-if(
-cp>=0x0660 &&
-cp<=0x0669
-)
-return String.fromCodePoint(
-0x0660+d
-);
-
-
-if(
-cp>=0x06F0 &&
-cp<=0x06F9
-)
-return String.fromCodePoint(
-0x06F0+d
-);
-
-
-return String(d);
-
-}
-
-
-function replacement(
-old,
-newNo
-){
-
-const src=String(old);
-
-const raw=String(newNo);
-
-
-const digits =
-(raw.match(/\p{Nd}/gu)||[])
-.map(
-c=>parseInt(c,10)
-)
-.filter(
-Number.isFinite
-);
-
-
-if(!digits.length)
-throw Error(
-"New number must contain digits."
-);
-
-
-const runs =
-src.match(/\p{Nd}+/gu)||[];
-
-
-let groups=[];
-
-let pos=0;
-
-
-for(
-let i=0;
-i<runs.length;
-i++
-){
-
-const remainGroups =
-runs.length-i-1;
-
-
-const wanted =
-runs[i].length;
-
-
-let take;
-
-
-if(
-i===runs.length-1
-){
-
-take =
-digits.length-pos;
-
-}else{
-
-take =
-Math.min(
-wanted,
-Math.max(
-0,
-digits.length-pos-remainGroups
-)
-);
-
-}
-
-
-groups.push(
-digits.slice(
-pos,
-pos+take
-)
-);
-
-
-pos+=take;
-
-}
-
-
-if(!groups.length)
-groups=[digits];
-
-
-let gi=0;
-
-let di=0;
-
-let out="";
-
-
-for(
-const c of src
-){
-
-if(/\p{Nd}/u.test(c)){
-
-const g =
-groups[gi]||[];
-
-
-if(
-di<g.length
-){
-
-out+=
-mapDigitStyle(
-g[di++],
-c
-);
-
-}else{
-
-out+="";
-
-}
-
-
-if(
-di>=g.length
-){
-
-gi++;
-
-di=0;
-
-}
-
-}else{
-
-out+=c;
-
-}
-
-}
-
-
-if(
-pos<digits.length
-){
-
-out+=
-digits
-.slice(pos)
-.map(String)
-.join("");
-
-}
-
-
-return out;
-
-}
-
-
-function renderResults(){
-
-let body=
-$("resultsBody");
-
-
-body.innerHTML="";
-
-
-let vals=
-[...S.groups.values()]
-.sort(
-(a,b) =>
-a.kind===b.kind
-?
-b.count-a.count
-:
-(a.kind==="normal"?-1:1)
-);
-
-
-let v=0;
-
-let s=0;
-
-let o=0;
-
-
-for(
-let g of vals
-){
-
-o+=g.count;
-
-
-if(
-g.kind==="normal"
-)
-v++;
-else
-s++;
-
-
-let tr=
-document.createElement("tr");
-
-
-tr.innerHTML=`
-
-<td>
-
-<code>
-${esc(g.text)}
-</code>
-
-<div
-class="small"
-style="margin-top:5px"
->
-
-${
-g.kind==="normal"
-?
-"🟢 Normal phone"
-:
-"🟡 Suspicious"
-}
-
-</div>
-
-</td>
-
-<td>
-
-${esc(g.format)}
-
-<div class="small">
-
-${esc(g.reason)}
-
-</div>
-
-</td>
-
-<td>
-
-<b>
-${g.count}
-</b>
-
-</td>
-
-<td>
-
-<label style="font-weight:400">
-
-<input
-type="checkbox"
-data-k="${encodeURIComponent(g.text)}"
-${g.kind==="normal"?"checked":""}
->
-
-Confirm / replace all
-
-</label>
-
-</td>
-
-`;
-
-
-body.appendChild(tr);
-
-}
-
-
-body
-.querySelectorAll("input")
-.forEach(c=>{
-
-let k =
-decodeURIComponent(
-c.dataset.k
-);
-
-
-if(c.checked)
-S.selected.add(k);
-
-
-c.onchange=()=>{
-
-if(c.checked)
-S.selected.add(k);
-
-else
-S.selected.delete(k);
-
-
-$("replaceBtn").disabled =
-!S.selected.size;
-
-};
-
-});
-
-
-$("validPill").textContent =
-"Valid: "+v;
-
-
-$("suspiciousPill").textContent =
-"Suspicious: "+s;
-
-
-$("occPill").textContent =
-"Occurrences: "+o;
-
-
-$("suspiciousHelp")
-.classList
-.toggle(
-"hidden",
-!s
-);
-
-}
-
+/*
+Analyze entire PDF.
+*/
 
 async function analyze(){
 
-if(!S.file)
+if(!S.file){
+
 return;
+
+}
 
 
 try{
@@ -1452,19 +1390,28 @@ S.selected.clear();
 S.out=null;
 
 
-$("resultsBody").innerHTML="";
+$("resultsCard")
+.classList
+.add("hidden");
+
 
 $("downloadCard")
 .classList
 .add("hidden");
 
 
-$("analyzeBtn").disabled=true;
+$("analyzeBtn")
+.disabled=true;
 
 
-st("Reading PDF…");
+status(
+"Reading PDF…"
+);
 
-pg(2);
+
+progress(
+2
+);
 
 
 S.bytes =
@@ -1491,39 +1438,58 @@ const page =
 await S.pdf.getPage(p);
 
 
-const tc =
+const viewport =
+page.getViewport({
+scale:1
+});
+
+
+const textContent =
 await page.getTextContent({
 includeMarkedContent:false
 });
 
 
-analyzeLine(
-
-tc.items,
-
-p-1,
-
-page.getViewport({
-scale:1
-}),
-
-tc.styles
-
+const lines =
+makeLines(
+textContent.items,
+viewport,
+textContent.styles
 );
 
 
-pg(
+for(
+const line of lines
+){
+
+scanLine(
+line,
+p-1
+);
+
+}
+
+
+progress(
 5+
-p/S.pdf.numPages*92
+(
+p/
+S.pdf.numPages
+)*
+92
 );
 
 
-st(
+status(
 "Analyzing PDF…"
 );
 
 }
 
+
+/*
+Display results.
+*/
 
 renderResults();
 
@@ -1533,55 +1499,971 @@ $("resultsCard")
 .remove("hidden");
 
 
-st(
-"Analysis complete. Select the formats you want to replace, then enter your new number."
+$("analyzeBtn")
+.disabled=false;
+
+
+$("replaceBtn")
+.disabled=
+!S.selected.size;
+
+
+status(
+"Analysis complete. Enter the new number and click Replace ALL Confirmed."
 );
 
 
-pg(
+progress(
 100,
 false
 );
 
 
-$("analyzeBtn").disabled=false;
+}catch(error){
+
+console.error(error);
 
 
-$("replaceBtn").disabled =
-!S.selected.size;
-
-
-}catch(e){
-
-console.error(e);
-
-
-st(
+status(
 "Analysis failed: "+
-e.message
+error.message
 );
 
 
-pg(
+progress(
 0,
 false
 );
 
 
-$("analyzeBtn").disabled=false;
+$("analyzeBtn")
+.disabled=false;
 
 }
 
 }
 
+
+/*
+Render detection table.
+*/
+
+function renderResults(){
+
+const body =
+$("resultsBody");
+
+
+body.innerHTML="";
+
+
+let valid=0;
+
+let suspicious=0;
+
+let occurrences=0;
+
+
+const groups =
+[...S.groups.values()]
+.sort(
+(a,b)=>{
+
+if(
+a.kind!==b.kind
+){
+
+return
+a.kind==="normal"
+?
+-1
+:
+1;
+
+}
+
+
+return
+b.count-a.count;
+
+});
+
+
+for(
+const group of groups
+){
+
+occurrences+=
+group.count;
+
+
+if(
+group.kind==="normal"
+){
+
+valid++;
+
+}else{
+
+suspicious++;
+
+}
+
+
+const tr =
+document.createElement(
+"tr"
+);
+
+
+tr.innerHTML=`
+
+<td>
+
+<code>
+${esc(group.text)}
+</code>
+
+<div
+class="small"
+style="margin-top:4px"
+>
+
+${
+group.kind==="normal"
+?
+"🟢 Normal"
+:
+"🟡 Suspicious"
+}
+
+</div>
+
+</td>
+
+<td>
+
+${esc(group.format)}
+
+<div
+class="small"
+>
+
+${esc(group.reason)}
+
+</div>
+
+</td>
+
+<td>
+
+<b>
+${group.count}
+</b>
+
+</td>
+
+<td>
+
+<label
+style="font-weight:400"
+>
+
+<input
+
+type="checkbox"
+
+data-k="${encodeURIComponent(group.text)}"
+
+${
+group.kind==="normal"
+?
+"checked"
+:
+""
+}
+
+>
+
+Confirm
+
+</label>
+
+</td>
+
+`;
+
+
+body.appendChild(
+tr
+);
+
+}
+
+
+/*
+Checkbox events.
+*/
+
+body
+.querySelectorAll(
+"input"
+)
+.forEach(
+checkbox=>{
+
+const key =
+decodeURIComponent(
+checkbox.dataset.k
+);
+
+
+if(
+checkbox.checked
+){
+
+S.selected.add(
+key
+);
+
+}
+
+
+checkbox.onchange=()=>{
+
+if(
+checkbox.checked
+){
+
+S.selected.add(
+key
+);
+
+}else{
+
+S.selected.delete(
+key
+);
+
+}
+
+
+$("replaceBtn")
+.disabled=
+!S.selected.size;
+
+};
+
+});
+
+
+$("validPill")
+.textContent=
+"Valid: "+
+valid;
+
+
+$("suspiciousPill")
+.textContent=
+"Suspicious: "+
+suspicious;
+
+
+$("occPill")
+.textContent=
+"Occurrences: "+
+occurrences;
+
+}
+
+
+/*
+Preserve Unicode digit style.
+*/
+
+function styleDigit(
+number,
+oldCharacter
+){
+
+const code =
+oldCharacter.codePointAt(0);
+
+
+/*
+Fullwidth digits.
+*/
+
+if(
+code>=0xFF10 &&
+code<=0xFF19
+){
+
+return String.fromCodePoint(
+0xFF10+
+number
+);
+
+}
+
+
+/*
+Arabic-Indic.
+*/
+
+if(
+code>=0x0660 &&
+code<=0x0669
+){
+
+return String.fromCodePoint(
+0x0660+
+number
+);
+
+}
+
+
+/*
+Extended Arabic-Indic.
+*/
+
+if(
+code>=0x06F0 &&
+code<=0x06F9
+){
+
+return String.fromCodePoint(
+0x06F0+
+number
+);
+
+}
+
+
+return String(
+number
+);
+
+}
+
+
+/*
+Keep the OLD number's separators.
+
+Example:
+
+old:
++54-800 (345) 9560
+
+new:
++52-800-953-2863
+
+result:
+
++52-800 (953) 2863
+
+The user does not need to format
+the new number manually.
+*/
+
+function replacement(
+oldValue,
+newValue
+){
+
+const source =
+String(oldValue);
+
+
+const newDigits =
+digits(newValue);
+
+
+if(
+!newDigits.length
+){
+
+throw new Error(
+"New number must contain digits."
+);
+
+}
+
+
+let position=0;
+
+let output="";
+
+
+for(
+const character of source
+){
+
+if(
+/\p{Nd}/u.test(
+character
+)
+){
+
+if(
+position<
+newDigits.length
+){
+
+output+=
+styleDigit(
+newDigits[position],
+character
+);
+
+position++;
+
+}
+
+}else{
+
+/*
+Keep every separator,
+space, bracket, slash,
+hyphen etc. exactly.
+*/
+
+output+=character;
+
+}
+
+}
+
+
+/*
+If the new number has extra digits,
+append them instead of losing them.
+*/
+
+if(
+position<
+newDigits.length
+){
+
+output+=
+newDigits
+.slice(position)
+.join("");
+
+}
+
+
+return output;
+
+}
+
+
+/*
+Render the ORIGINAL PDF page.
+
+Nothing from the original page is
+reconstructed from extracted text.
+*/
+
+async function renderOriginalPage(
+page,
+scale
+){
+
+const viewport =
+page.getViewport({
+scale
+});
+
+
+const canvas =
+document.createElement(
+"canvas"
+);
+
+
+canvas.width =
+Math.ceil(
+viewport.width
+);
+
+
+canvas.height =
+Math.ceil(
+viewport.height
+);
+
+
+const ctx =
+canvas.getContext(
+"2d",
+{
+willReadFrequently:true
+}
+);
+
+
+await page.render({
+
+canvasContext:ctx,
+
+viewport
+
+}).promise;
+
+
+return {
+
+canvas,
+
+ctx,
+
+viewport
+
+};
+
+}
+
+
+/*
+Sample background immediately
+around the number.
+
+This prevents using a huge white
+rectangle over the paragraph.
+*/
+
+function sampleBackground(
+ctx,
+x,
+y,
+width,
+height
+){
+
+const canvas =
+ctx.canvas;
+
+
+const samples=[];
+
+
+function addSample(
+sx,
+sy
+){
+
+if(
+sx<0 ||
+sy<0 ||
+sx>=canvas.width ||
+sy>=canvas.height
+){
+
+return;
+
+}
+
+
+const pixel =
+ctx.getImageData(
+Math.floor(sx),
+Math.floor(sy),
+1,
+1
+).data;
+
+
+samples.push([
+
+pixel[0],
+
+pixel[1],
+
+pixel[2],
+
+pixel[3]
+
+]);
+
+}
+
+
+/*
+Sample above and below the
+number.
+*/
+
+for(
+let i=0;
+i<9;
+i++
+){
+
+const t=i/8;
+
+
+addSample(
+x+
+width*t,
+Math.max(
+0,
+y-3
+)
+);
+
+
+addSample(
+x+
+width*t,
+Math.min(
+canvas.height-1,
+y+height+3
+)
+);
+
+}
+
+
+/*
+Sample left and right.
+*/
+
+addSample(
+Math.max(
+0,
+x-3
+),
+y+
+height*.5
+);
+
+
+addSample(
+Math.min(
+canvas.width-1,
+x+width+3
+),
+y+
+height*.5
+);
+
+
+if(
+!samples.length
+){
+
+return [
+255,
+255,
+255,
+255
+];
+
+}
+
+
+/*
+Use median-ish sample.
+*/
+
+samples.sort(
+(a,b)=>
+(
+a[0]+a[1]+a[2]
+)
+-
+(
+b[0]+b[1]+b[2]
+)
+);
+
+
+return samples[
+Math.floor(
+samples.length/2
+)
+];
+
+}
+
+
+/*
+Erase ONLY the detected number.
+*/
+
+function eraseBox(
+ctx,
+box
+){
+
+const padding =
+Math.max(
+1,
+Math.ceil(
+box.h*.06
+)
+);
+
+
+const x =
+Math.max(
+0,
+Math.floor(
+box.x-padding
+)
+);
+
+
+const y =
+Math.max(
+0,
+Math.floor(
+box.y-padding
+)
+);
+
+
+const width =
+Math.min(
+ctx.canvas.width-x,
+Math.ceil(
+box.w+
+padding*2
+)
+);
+
+
+const height =
+Math.min(
+ctx.canvas.height-y,
+Math.ceil(
+box.h+
+padding*2
+)
+);
+
+
+if(
+width<=0 ||
+height<=0
+){
+
+return;
+
+}
+
+
+const color =
+sampleBackground(
+ctx,
+x,
+y,
+width,
+height
+);
+
+
+ctx.fillStyle =
+`rgb(
+${color[0]},
+${color[1]},
+${color[2]}
+)`;
+
+
+ctx.fillRect(
+x,
+y,
+width,
+height
+);
+
+}
+
+
+/*
+Draw replacement number
+inside exactly the detected
+number area.
+*/
+
+function drawReplacement(
+ctx,
+text,
+boxes
+){
+
+if(
+!boxes.length
+){
+
+return;
+
+}
+
+
+const left =
+Math.min(
+...boxes.map(
+b=>b.x
+)
+);
+
+
+const top =
+Math.min(
+...boxes.map(
+b=>b.y
+)
+);
+
+
+const right =
+Math.max(
+...boxes.map(
+b=>b.x+b.w
+)
+);
+
+
+const bottom =
+Math.max(
+...boxes.map(
+b=>b.y+b.h
+)
+);
+
+
+const width =
+Math.max(
+1,
+right-left
+);
+
+
+const height =
+Math.max(
+2,
+bottom-top
+);
+
+
+const originalBox =
+boxes[0];
+
+
+let fontSize =
+Math.max(
+5,
+Math.min(
+120,
+height*.82
+)
+);
+
+
+ctx.save();
+
+
+ctx.fillStyle="#000";
+
+
+ctx.textBaseline=
+"alphabetic";
+
+
+ctx.font =
+`${Math.round(fontSize)}px ${
+originalBox.family||
+"Arial"
+}`;
+
+
+/*
+Fit replacement inside the
+original number width.
+*/
+
+while(
+fontSize>5 &&
+ctx.measureText(text).width>
+width*.98
+){
+
+fontSize-=.5;
+
+
+ctx.font =
+`${Math.round(fontSize)}px ${
+originalBox.family||
+"Arial"
+}`;
+
+}
+
+
+/*
+Center horizontally inside
+the ORIGINAL number area.
+*/
+
+const textWidth =
+ctx.measureText(
+text
+).width;
+
+
+const x =
+left+
+Math.max(
+0,
+(width-textWidth)/2
+);
+
+
+const baseline =
+top+
+height*.83;
+
+
+ctx.fillText(
+text,
+x,
+baseline
+);
+
+
+ctx.restore();
+
+}
+
+
+/*
+MAIN REPLACEMENT
+
+The original PDF page is first
+rendered exactly.
+
+Then ONLY selected phone
+number regions are changed.
+
+The original paragraph is not
+rebuilt.
+*/
 
 async function replaceAll(){
 
-const newNo =
-$("newNumber").value.trim();
+const newNumber =
+$("newNumber")
+.value
+.trim();
 
 
-if(!newNo){
+if(
+!newNumber
+){
 
 alert(
 "Enter your new number first."
@@ -1592,7 +2474,9 @@ return;
 }
 
 
-if(!S.selected.size){
+if(
+!S.selected.size
+){
 
 alert(
 "Confirm at least one format first."
@@ -1605,7 +2489,8 @@ return;
 
 try{
 
-$("replaceBtn").disabled=true;
+$("replaceBtn")
+.disabled=true;
 
 
 $("downloadCard")
@@ -1613,47 +2498,30 @@ $("downloadCard")
 .add("hidden");
 
 
-st(
-"Preparing replacement…"
+status(
+"Rendering original pages and changing only confirmed numbers…"
 );
 
 
-pg(2);
-
-
-const groups =
-[...S.groups.values()]
-.filter(
-g =>
-S.selected.has(g.text)
+progress(
+2
 );
 
 
-const total =
-groups.reduce(
-(n,g)=>n+g.count,
-0
-);
+/*
+High rendering scale gives a
+cleaner output.
+*/
+
+const scale=2.5;
 
 
-const out =
-await PDFLib.PDFDocument
-.load(
-S.bytes
-);
+const rendered=[];
 
 
-const font =
-await out.embedFont(
-PDFLib.StandardFonts.Helvetica
-);
-
-
-const boldFont =
-await out.embedFont(
-PDFLib.StandardFonts.HelveticaBold
-);
-
+/*
+Render every ORIGINAL page.
+*/
 
 for(
 let p=1;
@@ -1661,324 +2529,250 @@ p<=S.pdf.numPages;
 p++
 ){
 
-const sourcePage =
-await S.pdf.getPage(p);
+const page =
+await S.pdf.getPage(
+p
+);
 
 
-const viewport =
-sourcePage.getViewport({
-scale:1
-});
+const renderedPage =
+await renderOriginalPage(
+page,
+scale
+);
 
 
-const target =
-out.getPage(p-1);
+rendered.push(
+renderedPage
+);
 
+
+progress(
+5+
+(
+p/
+S.pdf.numPages
+)*
+35
+);
+
+}
+
+
+let total=0;
+
+
+/*
+Replace selected formats.
+*/
 
 for(
-const g of groups
-){
-
-for(
-const q of g.occ
+const group of
+[...S.groups.values()]
 ){
 
 if(
-q.page!==p-1
+!S.selected.has(
+group.text
 )
+){
+
 continue;
 
-
-const bs =
-(q.boxes||[])
-.filter(
-b =>
-b &&
-Number.isFinite(b.x) &&
-Number.isFinite(b.y) &&
-b.w>0 &&
-b.h>0
-);
+}
 
 
-if(!bs.length)
-continue;
-
-
-const left =
-Math.min(
-...bs.map(
-b=>b.x
-)
-);
-
-
-const right =
-Math.max(
-...bs.map(
-b=>b.x+b.w
-)
-);
-
-
-const top =
-Math.min(
-...bs.map(
-b=>b.y
-)
-);
-
-
-const bottom =
-Math.max(
-...bs.map(
-b=>b.y+b.h
-)
-);
-
-
-const p1 =
-viewport.convertToPdfPoint(
-left,
-bottom
-);
-
-
-const p2 =
-viewport.convertToPdfPoint(
-right,
-top
-);
-
-
-const rx =
-Math.min(
-p1[0],
-p2[0]
-);
-
-
-const ry =
-Math.min(
-p1[1],
-p2[1]
-);
-
-
-const rw =
-Math.abs(
-p2[0]-p1[0]
-);
-
-
-const rh =
-Math.abs(
-p2[1]-p1[1]
-);
-
-
-if(
-![rx,ry,rw,rh]
-.every(Number.isFinite)
-||
-rw<=0 ||
-rh<=0
-)
-continue;
-
-
-const text =
+const replacementText =
 replacement(
-g.text,
-newNo
+group.text,
+newNumber
 );
 
 
-const pad =
-Math.min(
-1.2,
-Math.max(
-0.35,
-rh*0.035
-)
+for(
+const occurrence of
+group.occ
+){
+
+const renderedPage =
+rendered[
+occurrence.page
+];
+
+
+if(
+!renderedPage
+){
+
+continue;
+
+}
+
+
+/*
+Detection coordinates were
+created at scale 1.
+
+Convert them to the actual
+rendering scale.
+*/
+
+const boxes =
+occurrence.boxes
+.map(
+box=>({
+
+...box,
+
+x:box.x*scale,
+
+y:box.y*scale,
+
+w:box.w*scale,
+
+h:box.h*scale,
+
+fontSize:
+box.fontSize*scale
+
+})
 );
 
 
 /*
-IMPORTANT:
-
-Only the exact detected number
-rectangle is covered.
-
-The complete paragraph,
-text line or text item is NOT covered.
+ONLY the number area.
 */
 
-
-target.drawRectangle({
-
-x:rx-pad,
-
-y:ry-pad,
-
-width:rw+pad*2,
-
-height:rh+pad*2,
-
-color:
-PDFLib.rgb(
-1,
-1,
-1
-),
-
-borderWidth:0
-
-});
-
-
-const basePoint =
-viewport.convertToPdfPoint(
-left,
-bottom
-);
-
-
-const useBold =
-bs.some(
-b =>
-/bold|black|heavy/i
-.test(b.font)
-||
-/bold|700|800|900/i
-.test(b.family)
-);
-
-
-const chosen =
-useBold
-?
-boldFont
-:
-font;
-
-
-let fontSize =
-Math.max(
-5,
-Math.min(
-72,
-rh*0.82
-)
-);
-
-
-const available =
-Math.max(
-4,
-rw-pad*2
-);
-
-
-let measured =
-chosen.widthOfTextAtSize(
-text,
-fontSize
-);
-
-
-if(
-measured>available
+for(
+const box of boxes
 ){
 
-fontSize =
-Math.max(
-4,
-fontSize*
-available/
-measured
+eraseBox(
+renderedPage.ctx,
+box
 );
 
 }
 
 
-const tw =
-chosen.widthOfTextAtSize(
-text,
-fontSize
+/*
+ONLY the replacement number.
+*/
+
+drawReplacement(
+renderedPage.ctx,
+replacementText,
+boxes
 );
 
 
-const tx =
-basePoint[0]
-+
+total++;
+
+}
+
+
+progress(
+40+
+(
+[...S.groups.values()]
+.indexOf(group)+1
+)/
 Math.max(
-0,
-(rw-tw)/2
+1,
+S.groups.size
+)*
+45
+);
+
+}
+
+
+/*
+Create output PDF from the
+already-rendered ORIGINAL pages.
+
+The page dimensions are scaled
+back to the original dimensions.
+*/
+
+const output =
+await PDFLib.PDFDocument.create();
+
+
+for(
+let i=0;
+i<rendered.length;
+i++
+){
+
+const pageData =
+rendered[i];
+
+
+const jpeg =
+pageData.canvas.toDataURL(
+"image/jpeg",
+0.98
 );
 
 
-const ty =
-ry
-+
-Math.max(
-0,
-(rh-fontSize)*0.16
+const image =
+await output.embedJpg(
+jpeg
 );
 
 
-target.drawText(
-text,
+/*
+Original page dimensions.
+*/
+
+const outputPage =
+output.addPage([
+
+pageData.viewport.width/
+scale,
+
+pageData.viewport.height/
+scale
+
+]);
+
+
+outputPage.drawImage(
+image,
 {
 
-x:tx,
+x:0,
 
-y:ty,
+y:0,
 
-size:fontSize,
+width:
+pageData.viewport.width/
+scale,
 
-font:chosen,
-
-color:
-PDFLib.rgb(
-0.05,
-0.05,
-0.05
-),
-
-lineHeight:
-fontSize
+height:
+pageData.viewport.height/
+scale
 
 }
 );
 
 }
 
-}
 
-}
-
-
-pg(
-5+
-p/S.pdf.numPages*92
-);
-
-
-st(
-"Replacing confirmed numbers…"
-);
-
-}
-
+/*
+Save modified PDF.
+*/
 
 S.out =
-await out.save({
+await output.save({
+
 useObjectStreams:true
+
 });
 
 
-pg(
+progress(
 100,
 false
 );
@@ -1991,35 +2785,38 @@ $("downloadCard")
 
 $("downloadText")
 .textContent =
+
 total+
-" confirmed occurrence(s) replaced. Original PDF content and page geometry retained.";
+" confirmed occurrence(s) replaced. The original page was rendered first; only the selected number areas were modified.";
 
 
-st(
-"Complete — updated PDF is ready to download."
+status(
+"Complete. Download the updated PDF."
 );
 
 
-}catch(e){
+}catch(error){
 
-console.error(e);
+console.error(
+error
+);
 
 
-st(
+status(
 "Replacement failed: "+
-e.message
+error.message
 );
 
 
 alert(
 "Replacement failed: "+
-e.message
+error.message
 );
-
 
 }finally{
 
-$("replaceBtn").disabled =
+$("replaceBtn")
+.disabled=
 !S.selected.size;
 
 }
@@ -2027,14 +2824,27 @@ $("replaceBtn").disabled =
 }
 
 
+/*
+Download output.
+*/
+
 function download(){
 
-if(!S.out)
+if(
+!S.out
+){
+
 return;
 
+}
 
-let name =
-(S.file.name||"document.pdf")
+
+const filename =
+
+(
+S.file.name||
+"document.pdf"
+)
 .replace(
 /\.pdf$/i,
 ""
@@ -2043,54 +2853,76 @@ let name =
 "-replaced.pdf";
 
 
-let u =
+const url =
 URL.createObjectURL(
+
 new Blob(
-[S.out],
+[
+S.out
+],
 {
 type:"application/pdf"
 }
 )
+
 );
 
 
-let a =
-document.createElement("a");
+const link =
+document.createElement(
+"a"
+);
 
 
-a.href=u;
+link.href=url;
 
-a.download=name;
+link.download=
+filename;
 
 
-document.body.appendChild(a);
+document.body.appendChild(
+link
+);
 
-a.click();
 
-a.remove();
+link.click();
+
+
+link.remove();
 
 
 setTimeout(
-() =>
-URL.revokeObjectURL(u),
+()=>{
+URL.revokeObjectURL(
+url
+);
+},
 30000
 );
 
 }
 
 
-$("pdfFile").onchange =
-e => {
+/*
+File selection.
+*/
+
+$("pdfFile")
+.onchange =
+event => {
 
 S.file =
-e.target.files[0]||null;
+event.target.files[0]||
+null;
 
 
-$("analyzeBtn").disabled =
+$("analyzeBtn")
+.disabled=
 !S.file;
 
 
-$("replaceBtn").disabled=true;
+$("replaceBtn")
+.disabled=true;
 
 
 $("downloadCard")
@@ -2098,29 +2930,44 @@ $("downloadCard")
 .add("hidden");
 
 
-if(S.file)
-st(
+if(
+S.file
+){
+
+status(
 "Selected: "+
 S.file.name
 );
 
+}
+
 };
 
 
-$("analyzeBtn").onclick =
+/*
+Buttons.
+*/
+
+$("analyzeBtn")
+.onclick=
 analyze;
 
 
-$("replaceBtn").onclick =
+$("replaceBtn")
+.onclick=
 replaceAll;
 
 
-$("downloadBtn").onclick =
+$("downloadBtn")
+.onclick=
 download;
 
 
-$("clearBtn").onclick =
-() => location.reload();
+$("clearBtn")
+.onclick=
+()=>{
+location.reload();
+};
 
 </script>
 
