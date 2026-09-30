@@ -1,104 +1,2128 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PDF Number Analyzer & Replacer</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+
 <style>
-*{box-sizing:border-box}body{margin:0;background:#f5f7fb;color:#172033;font-family:Arial,Helvetica,sans-serif}.wrap{max-width:1100px;margin:28px auto;padding:0 16px}.card{background:#fff;border:1px solid #e1e6ee;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 8px 25px rgba(20,35,60,.06)}h1{margin:0 0 7px;font-size:27px}.sub,.muted,.small{color:#667085}.row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.field{flex:1;min-width:260px}label{display:block;font-weight:700;margin-bottom:7px}input[type=file],input[type=text]{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font-size:15px}button{border:0;border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer;background:#172033;color:#fff}button:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#e8edf4;color:#172033}.success{background:#16834b}.status{padding:12px;border-radius:10px;background:#f2f4f7;margin-top:14px;white-space:pre-wrap}.progress{height:8px;background:#e5e7eb;border-radius:20px;overflow:hidden;margin-top:12px;display:none}.bar{height:100%;width:0;background:#172033}.hidden{display:none}.summary{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}.pill{padding:7px 11px;border-radius:99px;background:#eef2f7;font-weight:700}.green{background:#e8f7ef;color:#12633d}.yellow{background:#fff3d9;color:#7a4a00}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:10px;border-bottom:1px solid #edf0f4;vertical-align:top}th{font-size:13px;color:#667085;background:#fafbfd}code{background:#f2f4f7;padding:2px 5px;border-radius:5px;word-break:break-all}.box{padding:13px;border-radius:11px;margin-top:12px}.warn{background:#fff5f2;border:1px solid #f2c7bf}.ok{background:#effaf4;border:1px solid #b9e4ca}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:#f5f7fb;
+  color:#172033;
+  font-family:Arial,Helvetica,sans-serif
+}
+
+.wrap{
+  max-width:1100px;
+  margin:28px auto;
+  padding:0 16px
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e1e6ee;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:0 8px 25px rgba(20,35,60,.06)
+}
+
+h1{
+  margin:0 0 7px;
+  font-size:27px
+}
+
+.sub,.muted,.small{
+  color:#667085
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  align-items:end;
+  flex-wrap:wrap
+}
+
+.field{
+  flex:1;
+  min-width:260px
+}
+
+label{
+  display:block;
+  font-weight:700;
+  margin-bottom:7px
+}
+
+input[type=file],
+input[type=text]{
+  width:100%;
+  padding:12px;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  font-size:15px
+}
+
+button{
+  border:0;
+  border-radius:10px;
+  padding:12px 16px;
+  font-weight:700;
+  cursor:pointer;
+  background:#172033;
+  color:#fff
+}
+
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed
+}
+
+.secondary{
+  background:#e8edf4;
+  color:#172033
+}
+
+.success{
+  background:#16834b
+}
+
+.status{
+  padding:12px;
+  border-radius:10px;
+  background:#f2f4f7;
+  margin-top:14px;
+  white-space:pre-wrap
+}
+
+.progress{
+  height:8px;
+  background:#e5e7eb;
+  border-radius:20px;
+  overflow:hidden;
+  margin-top:12px;
+  display:none
+}
+
+.bar{
+  height:100%;
+  width:0;
+  background:#172033
+}
+
+.hidden{
+  display:none
+}
+
+.summary{
+  display:flex;
+  gap:9px;
+  flex-wrap:wrap;
+  margin-bottom:12px
+}
+
+.pill{
+  padding:7px 11px;
+  border-radius:99px;
+  background:#eef2f7;
+  font-weight:700
+}
+
+.green{
+  background:#e8f7ef;
+  color:#12633d
+}
+
+.yellow{
+  background:#fff3d9;
+  color:#7a4a00
+}
+
+.table-wrap{
+  overflow:auto
+}
+
+table{
+  width:100%;
+  border-collapse:collapse
+}
+
+th,td{
+  text-align:left;
+  padding:10px;
+  border-bottom:1px solid #edf0f4;
+  vertical-align:top
+}
+
+th{
+  font-size:13px;
+  color:#667085;
+  background:#fafbfd
+}
+
+code{
+  background:#f2f4f7;
+  padding:2px 5px;
+  border-radius:5px;
+  word-break:break-all
+}
+
+.box{
+  padding:13px;
+  border-radius:11px;
+  margin-top:12px
+}
+
+.warn{
+  background:#fff5f2;
+  border:1px solid #f2c7bf
+}
+
+.ok{
+  background:#effaf4;
+  border:1px solid #b9e4ca
+}
 </style>
-</head><body><div class="wrap">
-<div class="card"><h1>PDF Number Analyzer & Replacer</h1><p class="sub">Analyze phone-like numbers, unusual letters-mixed formats, and replace only confirmed formats while preserving their separators.</p>
-<label>Upload PDF</label><input id="pdfFile" type="file" accept="application/pdf">
-<div class="row" style="margin-top:14px"><div class="field"><label>Your new number</label><input id="newNumber" type="text" inputmode="tel" placeholder="+52-800-953-2863"></div><button id="analyzeBtn" disabled>Analyze PDF</button><button id="replaceBtn" class="success" disabled>Replace ALL Confirmed</button><button id="clearBtn" class="secondary">Clear</button></div>
-<div id="status" class="status">Upload a PDF to begin.</div><div id="progress" class="progress"><div id="bar" class="bar"></div></div></div>
-<div id="resultsCard" class="card hidden"><h2 style="margin:0 0 10px">Detected formats</h2><div class="summary"><div id="validPill" class="pill green">Valid: 0</div><div id="suspiciousPill" class="pill yellow">Suspicious: 0</div><div id="occPill" class="pill">Occurrences: 0</div></div><div class="muted" style="margin-bottom:10px">Page numbers are not shown. Suspicious formats must be confirmed before replacement.</div><div class="table-wrap"><table><thead><tr><th>Detected content</th><th>Format / reason</th><th>Found</th><th>Replace</th></tr></thead><tbody id="resultsBody"></tbody></table></div><div id="suspiciousHelp" class="box warn hidden"><b>⚠ Suspicious / possible phone-like content</b><br>Examples such as <code>52-800-ABC-461-XYZ-1544</code> are shown here and are not replaced unless you confirm them.</div></div>
-<div id="downloadCard" class="card hidden"><h2 style="margin:0 0 8px">Replacement complete</h2><div id="downloadText" class="box ok"></div><button id="downloadBtn" class="success" style="margin-top:12px">⬇ Download PDF</button></div>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<div class="card">
+
+<h1>PDF Number Analyzer & Replacer</h1>
+
+<p class="sub">
+Analyze phone-like numbers, unusual letters-mixed formats,
+and replace only confirmed formats while preserving their separators.
+</p>
+
+<label>Upload PDF</label>
+
+<input id="pdfFile" type="file" accept="application/pdf">
+
+<div class="row" style="margin-top:14px">
+
+<div class="field">
+
+<label>Your new number</label>
+
+<input
+id="newNumber"
+type="text"
+inputmode="tel"
+placeholder="+52-800-953-2863">
+
 </div>
+
+<button id="analyzeBtn" disabled>
+Analyze PDF
+</button>
+
+<button id="replaceBtn" class="success" disabled>
+Replace ALL Confirmed
+</button>
+
+<button id="clearBtn" class="secondary">
+Clear
+</button>
+
+</div>
+
+<div id="status" class="status">
+Upload a PDF to begin.
+</div>
+
+<div id="progress" class="progress">
+<div id="bar" class="bar"></div>
+</div>
+
+</div>
+
+
+<div id="resultsCard" class="card hidden">
+
+<h2 style="margin:0 0 10px">
+Detected formats
+</h2>
+
+<div class="summary">
+
+<div id="validPill" class="pill green">
+Valid: 0
+</div>
+
+<div id="suspiciousPill" class="pill yellow">
+Suspicious: 0
+</div>
+
+<div id="occPill" class="pill">
+Occurrences: 0
+</div>
+
+</div>
+
+<div class="muted" style="margin-bottom:10px">
+Page numbers are not shown.
+Suspicious formats must be confirmed before replacement.
+</div>
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+
+<tr>
+<th>Detected content</th>
+<th>Format / reason</th>
+<th>Found</th>
+<th>Replace</th>
+</tr>
+
+</thead>
+
+<tbody id="resultsBody"></tbody>
+
+</table>
+
+</div>
+
+<div id="suspiciousHelp" class="box warn hidden">
+
+<b>
+⚠ Suspicious / possible phone-like content
+</b>
+
+<br>
+
+Examples such as
+
+<code>52-800-ABC-461-XYZ-1544</code>
+
+are shown here and are not replaced unless you confirm them.
+
+</div>
+
+</div>
+
+
+<div id="downloadCard" class="card hidden">
+
+<h2 style="margin:0 0 8px">
+Replacement complete
+</h2>
+
+<div id="downloadText" class="box ok"></div>
+
+<button
+id="downloadBtn"
+class="success"
+style="margin-top:12px">
+
+⬇ Download PDF
+
+</button>
+
+</div>
+
+</div>
+
+
 <script>
+
 "use strict";
-pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-const $=id=>document.getElementById(id);const S={file:null,bytes:null,pdf:null,groups:new Map(),selected:new Set(),out:null};
-function st(x){$("status").textContent=x}function pg(x,on=true){$("progress").style.display=on?"block":"none";$("bar").style.width=Math.max(0,Math.min(100,x))+"%"}function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
-function nd(s){return String(s).replace(/\p{Nd}/gu,c=>{let n=parseInt(c,10);return Number.isFinite(n)?String(n):c})}function dc(s){return (nd(s).match(/\d/g)||[]).length}
-function dateLike(s){let t=nd(s).trim(),d=t.replace(/\D/g,"");return (d.length===4&&/^(19|20)\d{2}$/.test(d))||/^\d{1,2}[.\/-]\d{1,2}[.\/-]\d{2,4}$/.test(t)||/^\d{4}[.\/-]\d{1,2}[.\/-]\d{1,2}$/.test(t)}
-function fmt(s){let a=nd(s),g=a.match(/\d+/g)||[],sep=a.split(/\d+/).filter(Boolean);let x=g.map(v=>"X".repeat(v.length)).join(sep[0]||"");return (/^[\s]*[+＋]/.test(s)?"+":"")+x+(/[A-Za-z\p{L}]/u.test(s)?" + letters":"")}
-const SEP=" \\t\\-‐‑‒–—−_/\\\\.·:;,|~*#()\\[\\]{}<>+=@";
-const normalRE=new RegExp("(?<![\\d\\p{L}])(?:[+＋]?\\s*[\\d\\p{Nd}]{1,4})(?:["+SEP+"]+[\\d\\p{Nd}]{1,8}){1,7}(?![\\d\\p{L}])","gu");
-const suspiciousRE=new RegExp("(?<![\\d\\p{L}])(?:[+＋]?\\s*[A-Za-z\\p{L}\\p{Nd}]{1,18})(?:["+SEP+"]+[A-Za-z\\p{L}\\p{Nd}]{1,18}){2,7}(?![\\d\\p{L}])","gu");
-function itemBox(it){if(!it||!Array.isArray(it.transform)||it.transform.length<6)return null;let x=+it.transform[4],y=+it.transform[5],fs=Math.abs(+it.transform[3])||10,w=+it.width,h=+it.height||fs;return Number.isFinite(x)&&Number.isFinite(y)?{x,y,w:Number.isFinite(w)?w:0,h:Math.abs(h)||fs,fs,font:it.fontName||""}:null}
-function lines(items){let a=[];items.forEach((it,i)=>{if(typeof it.str!=="string"||!it.str)return;let b=itemBox(it);if(b)a.push({i,str:it.str,b})});a.sort((x,y)=>Math.abs(x.b.y-y.b.y)<4?x.b.x-y.b.x:y.b.y-x.b.y);let out=[];for(let q of a){let l=out.find(z=>Math.abs(z.y-q.b.y)<=Math.max(4,Math.min(12,q.b.h*.65)));if(!l){l={y:q.b.y,a:[]};out.push(l)}l.a.push(q)}for(let l of out){l.a.sort((x,y)=>x.b.x-y.b.x);l.text="";l.r=[];for(let q of l.a){let s=l.text.length;l.text+=q.str;l.r.push({s,e:l.text.length,q})}}return out}
-function add(text,kind,line,page,start,end){text=text.trim();let d=dc(text);if(d<7||d>15)return;if(kind==="normal"&&dateLike(text))return;let g=S.groups.get(text);if(!g){g={text,kind,count:0,format:fmt(text),reason:kind==="suspicious"?"Digits mixed with letters or unusual phone-like structure.":"Numeric phone-like pattern.",occ:[]};S.groups.set(text,g)}g.count++;g.occ.push({page,line,start,end,boxes:boxes(line,start,end)})}
-function scan(line,page){let ranges=[],m;normalRE.lastIndex=0;while((m=normalRE.exec(line.text))){let t=m[0].trim();if(dc(t)>=7&&dc(t)<=15&&!dateLike(t)){ranges.push({s:m.index,e:m.index+m[0].length});add(t,"normal",line,page,m.index,m.index+m[0].length)}}suspiciousRE.lastIndex=0;while((m=suspiciousRE.exec(line.text))){let t=m[0].trim();if(!/[A-Za-z\p{L}]/u.test(t)||dc(t)<7||dc(t)>15)continue;if(ranges.some(r=>m.index<r.e&&m.index+m[0].length>r.s))continue;add(t,"suspicious",line,page,m.index,m.index+m[0].length)}}
-function analyzeLine(text,page){let ls=lines(text);for(let l of ls)scan(l,page)}
-function replacement(old,newNo){
-  const src=String(old);
-  const raw=String(newNo);
-  const digits=(raw.match(/\p{Nd}/gu)||[]).map(c=>parseInt(c,10)).filter(Number.isFinite);
-  if(!digits.length)throw Error("New number must contain digits.");
-  let di=0,out="";
-  const mapDigit=(d,template)=>{
-    const cp=template.codePointAt(0);
-    if(cp>=0xFF10&&cp<=0xFF19)return String.fromCodePoint(0xFF10+d);
-    if(cp>=0x0660&&cp<=0x0669)return String.fromCodePoint(0x0660+d);
-    if(cp>=0x06F0&&cp<=0x06F9)return String.fromCodePoint(0x06F0+d);
-    return String(d);
-  };
-  for(const c of src){
-    if(/\p{Nd}/u.test(c)){
-      if(di<digits.length)out+=mapDigit(digits[di++],c);
-      else out+=c;
-    }else out+=c;
-  }
-  if(di<digits.length){
-    // Keep the original format and put any extra digits at the end.
-    out+=digits.slice(di).map(String).join("");
-  }
-  return out;
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+
+const $ = id => document.getElementById(id);
+
+
+const S = {
+
+file:null,
+bytes:null,
+pdf:null,
+groups:new Map(),
+selected:new Set(),
+out:null
+
+};
+
+
+function st(x){
+
+$("status").textContent=x;
+
 }
-function boxes(line,start,end){let b=[];for(let r of line.r)if(r.e>start&&r.s<end)b.push(r.q.b);return b}
-function renderResults(){let body=$("resultsBody");body.innerHTML="";let vals=[...S.groups.values()].sort((a,b)=>a.kind===b.kind?b.count-a.count:(a.kind==="normal"?-1:1));let v=0,s=0,o=0;for(let g of vals){o+=g.count;if(g.kind==="normal")v++;else s++;let tr=document.createElement("tr");tr.innerHTML=`<td><code>${esc(g.text)}</code><div class="small" style="margin-top:5px">${g.kind==="normal"?"🟢 Normal phone":"🟡 Suspicious"}</div></td><td>${esc(g.format)}<div class="small">${esc(g.reason)}</div></td><td><b>${g.count}</b></td><td><label style="font-weight:400"><input type="checkbox" data-k="${encodeURIComponent(g.text)}" ${g.kind==="normal"?"checked":""}> Confirm / replace all</label></td>`;body.appendChild(tr)}body.querySelectorAll("input").forEach(c=>{let k=decodeURIComponent(c.dataset.k);if(c.checked)S.selected.add(k);c.onchange=()=>{c.checked?S.selected.add(k):S.selected.delete(k);$("replaceBtn").disabled=!S.selected.size}});$("validPill").textContent="Valid: "+v;$("suspiciousPill").textContent="Suspicious: "+s;$("occPill").textContent="Occurrences: "+o;$("suspiciousHelp").classList.toggle("hidden",!s)}
+
+
+function pg(x,on=true){
+
+$("progress").style.display =
+on ? "block" : "none";
+
+$("bar").style.width =
+Math.max(0,Math.min(100,x))+"%";
+
+}
+
+
+function esc(s){
+
+return String(s).replace(
+/[&<>"']/g,
+c => ({
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+"\"":"&quot;",
+"'":"&#39;"
+}[c])
+);
+
+}
+
+
+function nd(s){
+
+return String(s).replace(
+/\p{Nd}/gu,
+c => {
+
+let n=parseInt(c,10);
+
+return Number.isFinite(n)
+? String(n)
+: c;
+
+});
+
+}
+
+
+function dc(s){
+
+return (nd(s).match(/\d/g)||[]).length;
+
+}
+
+
+function dateLike(s){
+
+let t=nd(s).trim();
+
+let d=t.replace(/\D/g,"");
+
+return (
+
+(d.length===4 &&
+/^(19|20)\d{2}$/.test(d))
+
+||
+
+/^\d{1,2}[.\/-]\d{1,2}[.\/-]\d{2,4}$/.test(t)
+
+||
+
+/^\d{4}[.\/-]\d{1,2}[.\/-]\d{1,2}$/.test(t)
+
+);
+
+}
+
+
+function fmt(s){
+
+let a=nd(s);
+
+let g=a.match(/\d+/g)||[];
+
+let sep=a.split(/\d+/).filter(Boolean);
+
+let x=g.map(v=>"X".repeat(v.length))
+.join(sep[0]||"");
+
+return
+
+(/^[\s]*[+＋]/.test(s) ? "+" : "")
++
+x
++
+(/[A-Za-z\p{L}]/u.test(s) ? " + letters" : "");
+
+}
+
+
+const SEP =
+" \\t\\-‐-‒–—−_/\\\\.·:;,|~*#()\\[\\]{}<>+=@";
+
+
+const normalRE = new RegExp(
+
+"(?<![\\d\\p{L}])" +
+"(?:[+＋]?\\s*[\\d\\p{Nd}]{1,4})" +
+"(?:["+SEP+"]+[\\d\\p{Nd}]{1,8}){1,7}" +
+"(?![\\d\\p{L}])",
+
+"gu"
+
+);
+
+
+const suspiciousRE = new RegExp(
+
+"(?<![\\d\\p{L}])" +
+"(?:[+＋]?\\s*[A-Za-z\\p{L}\\p{Nd}]{1,18})" +
+"(?:["+SEP+"]+[A-Za-z\\p{L}\\p{Nd}]{1,18}){2,7}" +
+"(?![\\d\\p{L}])",
+
+"gu"
+
+);
+
+
+function itemBox(it,viewport,styles){
+
+if(
+!it ||
+!Array.isArray(it.transform) ||
+it.transform.length<6 ||
+!viewport
+)return null;
+
+
+const x=+it.transform[4];
+
+const y=+it.transform[5];
+
+
+const fs=Math.max(
+1,
+Math.hypot(
++it.transform[2]||0,
++it.transform[3]||10
+)
+);
+
+
+const w =
+Number.isFinite(+it.width)
+? Math.abs(+it.width)
+: 0;
+
+
+const h =
+Number.isFinite(+it.height) &&
++it.height!==0
+? Math.abs(+it.height)
+: fs;
+
+
+const pt =
+viewport.convertToViewportPoint(x,y);
+
+
+if(
+!Number.isFinite(pt[0]) ||
+!Number.isFinite(pt[1])
+)return null;
+
+
+const style =
+styles && it.fontName
+? styles[it.fontName]
+: null;
+
+
+const family =
+(style && style.fontFamily) ||
+"Arial, Helvetica, sans-serif";
+
+
+let widths=[];
+
+
+try{
+
+const c =
+itemBox._canvas ||
+(itemBox._canvas=document.createElement("canvas"));
+
+
+const ctx=c.getContext("2d");
+
+
+ctx.font =
+`${Math.max(1,fs)}px ${family}`;
+
+
+for(const ch of it.str){
+
+widths.push(
+Math.max(
+0,
+ctx.measureText(ch).width
+)
+);
+
+}
+
+}catch(e){
+
+widths=
+Array.from(
+it.str,
+()=>1
+);
+
+}
+
+
+let sum =
+widths.reduce(
+(a,b)=>a+b,
+0
+);
+
+
+if(!(sum>0))
+sum=it.str.length||1;
+
+
+const scale =
+w>0
+? w/sum
+: 0;
+
+
+const charX=[0];
+
+
+for(const z of widths){
+
+charX.push(
+charX[charX.length-1]+z*scale
+);
+
+}
+
+
+return {
+
+x:pt[0],
+y:pt[1],
+w,
+h,
+fs,
+font:it.fontName||"",
+family,
+charX,
+str:it.str
+
+};
+
+}
+
+
+function lines(items,viewport,styles){
+
+let a=[];
+
+
+items.forEach((it,i)=>{
+
+if(
+typeof it.str!=="string" ||
+!it.str
+)return;
+
+
+let b =
+itemBox(
+it,
+viewport,
+styles
+);
+
+
+if(b)
+a.push({
+i,
+str:it.str,
+b
+});
+
+});
+
+
+a.sort(
+(x,y) =>
+Math.abs(x.b.y-y.b.y)<4
+?
+x.b.x-y.b.x
+:
+x.b.y-y.b.y
+);
+
+
+let out=[];
+
+
+for(let q of a){
+
+let l =
+out.find(
+z =>
+Math.abs(z.y-q.b.y)
+<=
+Math.max(
+4,
+Math.min(
+12,
+q.b.h*.65
+)
+)
+);
+
+
+if(!l){
+
+l={
+y:q.b.y,
+a:[]
+};
+
+out.push(l);
+
+}else{
+
+l.a.push(q);
+
+}
+
+}
+
+
+for(let l of out){
+
+l.a.sort(
+(x,y)=>x.b.x-y.b.x
+);
+
+l.text="";
+l.r=[];
+
+
+for(let q of l.a){
+
+let s=l.text.length;
+
+l.text+=q.str;
+
+l.r.push({
+s,
+e:l.text.length,
+q
+});
+
+}
+
+}
+
+
+return out;
+
+}
+
+
+function substringBoxes(
+line,
+start,
+end
+){
+
+const out=[];
+
+
+for(const r of line.r){
+
+const os =
+Math.max(
+start,
+r.s
+);
+
+
+const oe =
+Math.min(
+end,
+r.e
+);
+
+
+if(oe<=os)
+continue;
+
+
+const localS =
+os-r.s;
+
+
+const localE =
+oe-r.s;
+
+
+const b=r.q.b;
+
+
+const x1 =
+b.x+
+(b.charX[localS]||0);
+
+
+const x2 =
+b.x+
+(b.charX[localE]||b.w);
+
+
+const left =
+Math.min(x1,x2);
+
+
+const width =
+Math.max(
+0.5,
+Math.abs(x2-x1)
+);
+
+
+const top =
+b.y-
+Math.max(
+b.h,
+b.fs
+)*0.88;
+
+
+const height =
+Math.max(
+b.h,
+b.fs
+)*1.05;
+
+
+out.push({
+
+x:left,
+y:top,
+w:width,
+h:height,
+fs:b.fs,
+font:b.font,
+family:b.family
+
+});
+
+}
+
+
+return out;
+
+}
+
+
+function add(
+text,
+kind,
+line,
+page,
+start,
+end
+){
+
+text=text.trim();
+
+let d=dc(text);
+
+
+if(d<7||d>15)
+return;
+
+
+if(
+kind==="normal" &&
+dateLike(text)
+)
+return;
+
+
+let g=
+S.groups.get(text);
+
+
+if(!g){
+
+g={
+
+text,
+kind,
+count:0,
+
+format:fmt(text),
+
+reason:
+kind==="suspicious"
+?
+"Digits mixed with letters or unusual phone-like structure."
+:
+"Numeric phone-like pattern.",
+
+occ:[]
+
+};
+
+S.groups.set(
+text,
+g
+);
+
+}
+
+
+g.count++;
+
+
+g.occ.push({
+
+page,
+line,
+start,
+end,
+
+boxes:
+substringBoxes(
+line,
+start,
+end
+)
+
+});
+
+}
+
+
+function scan(
+line,
+page
+){
+
+let ranges=[];
+
+let m;
+
+
+normalRE.lastIndex=0;
+
+
+while(
+(m=normalRE.exec(line.text))
+){
+
+let raw=m[0];
+
+let t=raw.trim();
+
+
+const trimLeft =
+raw.search(/\S/);
+
+
+const s =
+m.index+
+(
+trimLeft<0
+?0
+:trimLeft
+);
+
+
+const e =
+s+t.length;
+
+
+if(
+dc(t)>=7 &&
+dc(t)<=15 &&
+!dateLike(t)
+){
+
+ranges.push({
+s,
+e
+});
+
+add(
+t,
+"normal",
+line,
+page,
+s,
+e
+);
+
+}
+
+}
+
+
+suspiciousRE.lastIndex=0;
+
+
+while(
+(m=suspiciousRE.exec(line.text))
+){
+
+let raw=m[0];
+
+let t=raw.trim();
+
+
+const trimLeft =
+raw.search(/\S/);
+
+
+const s =
+m.index+
+(
+trimLeft<0
+?0
+:trimLeft
+);
+
+
+const e =
+s+t.length;
+
+
+if(
+!/[A-Za-z\p{L}]/u.test(t) ||
+dc(t)<7 ||
+dc(t)>15
+)
+continue;
+
+
+if(
+ranges.some(
+r =>
+s<r.e &&
+e>r.s
+)
+)
+continue;
+
+
+add(
+t,
+"suspicious",
+line,
+page,
+s,
+e
+);
+
+}
+
+}
+
+
+function analyzeLine(
+text,
+page,
+viewport,
+styles
+){
+
+let ls =
+lines(
+text,
+viewport,
+styles
+);
+
+for(let l of ls)
+scan(l,page);
+
+}
+
+
+function mapDigitStyle(
+d,
+template
+){
+
+const cp =
+template.codePointAt(0);
+
+
+if(
+cp>=0xFF10 &&
+cp<=0xFF19
+)
+return String.fromCodePoint(
+0xFF10+d
+);
+
+
+if(
+cp>=0x0660 &&
+cp<=0x0669
+)
+return String.fromCodePoint(
+0x0660+d
+);
+
+
+if(
+cp>=0x06F0 &&
+cp<=0x06F9
+)
+return String.fromCodePoint(
+0x06F0+d
+);
+
+
+return String(d);
+
+}
+
+
+function replacement(
+old,
+newNo
+){
+
+const src=String(old);
+
+const raw=String(newNo);
+
+
+const digits =
+(raw.match(/\p{Nd}/gu)||[])
+.map(
+c=>parseInt(c,10)
+)
+.filter(
+Number.isFinite
+);
+
+
+if(!digits.length)
+throw Error(
+"New number must contain digits."
+);
+
+
+const runs =
+src.match(/\p{Nd}+/gu)||[];
+
+
+let groups=[];
+
+let pos=0;
+
+
+for(
+let i=0;
+i<runs.length;
+i++
+){
+
+const remainGroups =
+runs.length-i-1;
+
+
+const wanted =
+runs[i].length;
+
+
+let take;
+
+
+if(
+i===runs.length-1
+){
+
+take =
+digits.length-pos;
+
+}else{
+
+take =
+Math.min(
+wanted,
+Math.max(
+0,
+digits.length-pos-remainGroups
+)
+);
+
+}
+
+
+groups.push(
+digits.slice(
+pos,
+pos+take
+)
+);
+
+
+pos+=take;
+
+}
+
+
+if(!groups.length)
+groups=[digits];
+
+
+let gi=0;
+
+let di=0;
+
+let out="";
+
+
+for(
+const c of src
+){
+
+if(/\p{Nd}/u.test(c)){
+
+const g =
+groups[gi]||[];
+
+
+if(
+di<g.length
+){
+
+out+=
+mapDigitStyle(
+g[di++],
+c
+);
+
+}else{
+
+out+="";
+
+}
+
+
+if(
+di>=g.length
+){
+
+gi++;
+
+di=0;
+
+}
+
+}else{
+
+out+=c;
+
+}
+
+}
+
+
+if(
+pos<digits.length
+){
+
+out+=
+digits
+.slice(pos)
+.map(String)
+.join("");
+
+}
+
+
+return out;
+
+}
+
+
+function renderResults(){
+
+let body=
+$("resultsBody");
+
+
+body.innerHTML="";
+
+
+let vals=
+[...S.groups.values()]
+.sort(
+(a,b) =>
+a.kind===b.kind
+?
+b.count-a.count
+:
+(a.kind==="normal"?-1:1)
+);
+
+
+let v=0;
+
+let s=0;
+
+let o=0;
+
+
+for(
+let g of vals
+){
+
+o+=g.count;
+
+
+if(
+g.kind==="normal"
+)
+v++;
+else
+s++;
+
+
+let tr=
+document.createElement("tr");
+
+
+tr.innerHTML=`
+
+<td>
+
+<code>
+${esc(g.text)}
+</code>
+
+<div
+class="small"
+style="margin-top:5px"
+>
+
+${
+g.kind==="normal"
+?
+"🟢 Normal phone"
+:
+"🟡 Suspicious"
+}
+
+</div>
+
+</td>
+
+<td>
+
+${esc(g.format)}
+
+<div class="small">
+
+${esc(g.reason)}
+
+</div>
+
+</td>
+
+<td>
+
+<b>
+${g.count}
+</b>
+
+</td>
+
+<td>
+
+<label style="font-weight:400">
+
+<input
+type="checkbox"
+data-k="${encodeURIComponent(g.text)}"
+${g.kind==="normal"?"checked":""}
+>
+
+Confirm / replace all
+
+</label>
+
+</td>
+
+`;
+
+
+body.appendChild(tr);
+
+}
+
+
+body
+.querySelectorAll("input")
+.forEach(c=>{
+
+let k =
+decodeURIComponent(
+c.dataset.k
+);
+
+
+if(c.checked)
+S.selected.add(k);
+
+
+c.onchange=()=>{
+
+if(c.checked)
+S.selected.add(k);
+
+else
+S.selected.delete(k);
+
+
+$("replaceBtn").disabled =
+!S.selected.size;
+
+};
+
+});
+
+
+$("validPill").textContent =
+"Valid: "+v;
+
+
+$("suspiciousPill").textContent =
+"Suspicious: "+s;
+
+
+$("occPill").textContent =
+"Occurrences: "+o;
+
+
+$("suspiciousHelp")
+.classList
+.toggle(
+"hidden",
+!s
+);
+
+}
+
+
 async function analyze(){
-  if(!S.file) return;
-  try {
-    S.groups.clear(); S.selected.clear(); S.out=null;
-    $("resultsBody").innerHTML="";
-    $("downloadCard").classList.add("hidden");
-    $("analyzeBtn").disabled=true;
-    st("Reading PDF…"); pg(2);
-    S.bytes=new Uint8Array(await S.file.arrayBuffer());
-    S.pdf=await pdfjsLib.getDocument({data:S.bytes}).promise;
-    for(let p=1;p<=S.pdf.numPages;p++){
-      const page=await S.pdf.getPage(p);
-      const tc=await page.getTextContent({includeMarkedContent:false});
-      analyzeLine(tc.items,p-1);
-      pg(5+p/S.pdf.numPages*92);
-      st("Analyzing PDF…");
-    }
-    renderResults();
-    $("resultsCard").classList.remove("hidden");
-    st("Analysis complete. Select the formats you want to replace, then enter your new number.");
-    pg(100,false);
-    $("analyzeBtn").disabled=false;
-    $("replaceBtn").disabled=!S.selected.size;
-  } catch(e) {
-    console.error(e);
-    st("Analysis failed: "+e.message);
-    pg(0,false);
-    $("analyzeBtn").disabled=false;
-  }
+
+if(!S.file)
+return;
+
+
+try{
+
+S.groups.clear();
+
+S.selected.clear();
+
+S.out=null;
+
+
+$("resultsBody").innerHTML="";
+
+$("downloadCard")
+.classList
+.add("hidden");
+
+
+$("analyzeBtn").disabled=true;
+
+
+st("Reading PDF…");
+
+pg(2);
+
+
+S.bytes =
+new Uint8Array(
+await S.file.arrayBuffer()
+);
+
+
+S.pdf =
+await pdfjsLib
+.getDocument({
+data:S.bytes.slice()
+})
+.promise;
+
+
+for(
+let p=1;
+p<=S.pdf.numPages;
+p++
+){
+
+const page =
+await S.pdf.getPage(p);
+
+
+const tc =
+await page.getTextContent({
+includeMarkedContent:false
+});
+
+
+analyzeLine(
+
+tc.items,
+
+p-1,
+
+page.getViewport({
+scale:1
+}),
+
+tc.styles
+
+);
+
+
+pg(
+5+
+p/S.pdf.numPages*92
+);
+
+
+st(
+"Analyzing PDF…"
+);
+
 }
-function dataBytes(url){let b=atob(url.split(",")[1]),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}
-async function replaceAll(){let newNo=$("newNumber").value.trim();if(!newNo)return alert("Enter your new number first.");if(!S.selected.size)return alert("Confirm at least one format first.");try{$("replaceBtn").disabled=true;$("downloadCard").classList.add("hidden");st("Preparing replacement…");pg(2);let groups=[...S.groups.values()].filter(g=>S.selected.has(g.text)),total=groups.reduce((n,g)=>n+g.count,0),out=await PDFLib.PDFDocument.create();
-for(let p=1;p<=S.pdf.numPages;p++){let page=await S.pdf.getPage(p),base=page.getViewport({scale:1}),scale=2,view=page.getViewport({scale});let canvas=document.createElement("canvas");canvas.width=Math.ceil(view.width);canvas.height=Math.ceil(view.height);let ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);await page.render({canvasContext:ctx,viewport:view}).promise;for(let g of groups)for(let q of g.occ)if(q.page===p-1){let bs=(q.boxes||[]).filter(Boolean);if(!bs.length)continue;let x1=Math.min(...bs.map(b=>b.x)),x2=Math.max(...bs.map(b=>b.x+b.w)),y1=Math.min(...bs.map(b=>b.y-b.h)),y2=Math.max(...bs.map(b=>b.y));let a=view.convertToViewportPoint(x1,y1),b=view.convertToViewportPoint(x2,y2),x=Math.min(a[0],b[0])-3,y=Math.min(a[1],b[1])-3,w=Math.abs(b[0]-a[0])+6,h=Math.abs(b[1]-a[1])+6;ctx.fillStyle="#fff";ctx.fillRect(x,y,w,h);let newText=replacement(g.text,newNo);
-let fs=Math.max(8,Math.min(72,(y2-y1)*scale*.9));
-ctx.font=fs+"px Arial,Helvetica,sans-serif";
-// If the replacement is wider than the old number, reduce the font so it fits.
-let maxW=Math.max(10,w-2), measured=ctx.measureText(newText).width;
-if(measured>maxW)fs=Math.max(6,fs*maxW/measured);
-ctx.font=fs+"px Arial,Helvetica,sans-serif";ctx.fillStyle="#111";ctx.textBaseline="alphabetic";ctx.fillText(newText,x+1,y+h-2)}let img=await out.embedPng(dataBytes(canvas.toDataURL("image/png")));let op=out.addPage([base.width,base.height]);op.drawImage(img,{x:0,y:0,width:base.width,height:base.height});canvas.width=1;canvas.height=1;pg(5+p/S.pdf.numPages*92);st("Replacing confirmed numbers…")}
-S.out=await out.save({useObjectStreams:true,addDefaultPage:false});pg(100,false);$("downloadCard").classList.remove("hidden");$("downloadText").textContent=total+" confirmed occurrence(s) replaced. Original page dimensions preserved.";st("Complete — updated PDF is ready to download.")}catch(e){console.error(e);st("Replacement failed: "+e.message);alert("Replacement failed: "+e.message)}finally{$("replaceBtn").disabled=!S.selected.size}}
-function download(){if(!S.out)return;let name=(S.file.name||"document.pdf").replace(/\.pdf$/i,"")+"-replaced.pdf",u=URL.createObjectURL(new Blob([S.out],{type:"application/pdf"})),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000)}
-$("pdfFile").onchange=e=>{S.file=e.target.files[0]||null;$("analyzeBtn").disabled=!S.file;$("replaceBtn").disabled=true;$("downloadCard").classList.add("hidden");if(S.file)st("Selected: "+S.file.name)};$("analyzeBtn").onclick=analyze;$("replaceBtn").onclick=replaceAll;$("downloadBtn").onclick=download;$("clearBtn").onclick=()=>location.reload();
-</script></body></html>
+
+
+renderResults();
+
+
+$("resultsCard")
+.classList
+.remove("hidden");
+
+
+st(
+"Analysis complete. Select the formats you want to replace, then enter your new number."
+);
+
+
+pg(
+100,
+false
+);
+
+
+$("analyzeBtn").disabled=false;
+
+
+$("replaceBtn").disabled =
+!S.selected.size;
+
+
+}catch(e){
+
+console.error(e);
+
+
+st(
+"Analysis failed: "+
+e.message
+);
+
+
+pg(
+0,
+false
+);
+
+
+$("analyzeBtn").disabled=false;
+
+}
+
+}
+
+
+async function replaceAll(){
+
+const newNo =
+$("newNumber").value.trim();
+
+
+if(!newNo){
+
+alert(
+"Enter your new number first."
+);
+
+return;
+
+}
+
+
+if(!S.selected.size){
+
+alert(
+"Confirm at least one format first."
+);
+
+return;
+
+}
+
+
+try{
+
+$("replaceBtn").disabled=true;
+
+
+$("downloadCard")
+.classList
+.add("hidden");
+
+
+st(
+"Preparing replacement…"
+);
+
+
+pg(2);
+
+
+const groups =
+[...S.groups.values()]
+.filter(
+g =>
+S.selected.has(g.text)
+);
+
+
+const total =
+groups.reduce(
+(n,g)=>n+g.count,
+0
+);
+
+
+const out =
+await PDFLib.PDFDocument
+.load(
+S.bytes
+);
+
+
+const font =
+await out.embedFont(
+PDFLib.StandardFonts.Helvetica
+);
+
+
+const boldFont =
+await out.embedFont(
+PDFLib.StandardFonts.HelveticaBold
+);
+
+
+for(
+let p=1;
+p<=S.pdf.numPages;
+p++
+){
+
+const sourcePage =
+await S.pdf.getPage(p);
+
+
+const viewport =
+sourcePage.getViewport({
+scale:1
+});
+
+
+const target =
+out.getPage(p-1);
+
+
+for(
+const g of groups
+){
+
+for(
+const q of g.occ
+){
+
+if(
+q.page!==p-1
+)
+continue;
+
+
+const bs =
+(q.boxes||[])
+.filter(
+b =>
+b &&
+Number.isFinite(b.x) &&
+Number.isFinite(b.y) &&
+b.w>0 &&
+b.h>0
+);
+
+
+if(!bs.length)
+continue;
+
+
+const left =
+Math.min(
+...bs.map(
+b=>b.x
+)
+);
+
+
+const right =
+Math.max(
+...bs.map(
+b=>b.x+b.w
+)
+);
+
+
+const top =
+Math.min(
+...bs.map(
+b=>b.y
+)
+);
+
+
+const bottom =
+Math.max(
+...bs.map(
+b=>b.y+b.h
+)
+);
+
+
+const p1 =
+viewport.convertToPdfPoint(
+left,
+bottom
+);
+
+
+const p2 =
+viewport.convertToPdfPoint(
+right,
+top
+);
+
+
+const rx =
+Math.min(
+p1[0],
+p2[0]
+);
+
+
+const ry =
+Math.min(
+p1[1],
+p2[1]
+);
+
+
+const rw =
+Math.abs(
+p2[0]-p1[0]
+);
+
+
+const rh =
+Math.abs(
+p2[1]-p1[1]
+);
+
+
+if(
+![rx,ry,rw,rh]
+.every(Number.isFinite)
+||
+rw<=0 ||
+rh<=0
+)
+continue;
+
+
+const text =
+replacement(
+g.text,
+newNo
+);
+
+
+const pad =
+Math.min(
+1.2,
+Math.max(
+0.35,
+rh*0.035
+)
+);
+
+
+/*
+IMPORTANT:
+
+Only the exact detected number
+rectangle is covered.
+
+The complete paragraph,
+text line or text item is NOT covered.
+*/
+
+
+target.drawRectangle({
+
+x:rx-pad,
+
+y:ry-pad,
+
+width:rw+pad*2,
+
+height:rh+pad*2,
+
+color:
+PDFLib.rgb(
+1,
+1,
+1
+),
+
+borderWidth:0
+
+});
+
+
+const basePoint =
+viewport.convertToPdfPoint(
+left,
+bottom
+);
+
+
+const useBold =
+bs.some(
+b =>
+/bold|black|heavy/i
+.test(b.font)
+||
+/bold|700|800|900/i
+.test(b.family)
+);
+
+
+const chosen =
+useBold
+?
+boldFont
+:
+font;
+
+
+let fontSize =
+Math.max(
+5,
+Math.min(
+72,
+rh*0.82
+)
+);
+
+
+const available =
+Math.max(
+4,
+rw-pad*2
+);
+
+
+let measured =
+chosen.widthOfTextAtSize(
+text,
+fontSize
+);
+
+
+if(
+measured>available
+){
+
+fontSize =
+Math.max(
+4,
+fontSize*
+available/
+measured
+);
+
+}
+
+
+const tw =
+chosen.widthOfTextAtSize(
+text,
+fontSize
+);
+
+
+const tx =
+basePoint[0]
++
+Math.max(
+0,
+(rw-tw)/2
+);
+
+
+const ty =
+ry
++
+Math.max(
+0,
+(rh-fontSize)*0.16
+);
+
+
+target.drawText(
+text,
+{
+
+x:tx,
+
+y:ty,
+
+size:fontSize,
+
+font:chosen,
+
+color:
+PDFLib.rgb(
+0.05,
+0.05,
+0.05
+),
+
+lineHeight:
+fontSize
+
+}
+);
+
+}
+
+}
+
+}
+
+
+pg(
+5+
+p/S.pdf.numPages*92
+);
+
+
+st(
+"Replacing confirmed numbers…"
+);
+
+}
+
+
+S.out =
+await out.save({
+useObjectStreams:true
+});
+
+
+pg(
+100,
+false
+);
+
+
+$("downloadCard")
+.classList
+.remove("hidden");
+
+
+$("downloadText")
+.textContent =
+total+
+" confirmed occurrence(s) replaced. Original PDF content and page geometry retained.";
+
+
+st(
+"Complete — updated PDF is ready to download."
+);
+
+
+}catch(e){
+
+console.error(e);
+
+
+st(
+"Replacement failed: "+
+e.message
+);
+
+
+alert(
+"Replacement failed: "+
+e.message
+);
+
+
+}finally{
+
+$("replaceBtn").disabled =
+!S.selected.size;
+
+}
+
+}
+
+
+function download(){
+
+if(!S.out)
+return;
+
+
+let name =
+(S.file.name||"document.pdf")
+.replace(
+/\.pdf$/i,
+""
+)
++
+"-replaced.pdf";
+
+
+let u =
+URL.createObjectURL(
+new Blob(
+[S.out],
+{
+type:"application/pdf"
+}
+)
+);
+
+
+let a =
+document.createElement("a");
+
+
+a.href=u;
+
+a.download=name;
+
+
+document.body.appendChild(a);
+
+a.click();
+
+a.remove();
+
+
+setTimeout(
+() =>
+URL.revokeObjectURL(u),
+30000
+);
+
+}
+
+
+$("pdfFile").onchange =
+e => {
+
+S.file =
+e.target.files[0]||null;
+
+
+$("analyzeBtn").disabled =
+!S.file;
+
+
+$("replaceBtn").disabled=true;
+
+
+$("downloadCard")
+.classList
+.add("hidden");
+
+
+if(S.file)
+st(
+"Selected: "+
+S.file.name
+);
+
+};
+
+
+$("analyzeBtn").onclick =
+analyze;
+
+
+$("replaceBtn").onclick =
+replaceAll;
+
+
+$("downloadBtn").onclick =
+download;
+
+
+$("clearBtn").onclick =
+() => location.reload();
+
+</script>
+
+</body>
+</html>
