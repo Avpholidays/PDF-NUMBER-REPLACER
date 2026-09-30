@@ -29,12 +29,36 @@ const normalRE=new RegExp("(?<![\\d\\p{L}])(?:[+＋]?\\s*[\\d\\p{Nd}]{1,4})(?:["
 const suspiciousRE=new RegExp("(?<![\\d\\p{L}])(?:[+＋]?\\s*[A-Za-z\\p{L}\\p{Nd}]{1,18})(?:["+SEP+"]+[A-Za-z\\p{L}\\p{Nd}]{1,18}){2,7}(?![\\d\\p{L}])","gu");
 function itemBox(it){if(!it||!Array.isArray(it.transform)||it.transform.length<6)return null;let x=+it.transform[4],y=+it.transform[5],fs=Math.abs(+it.transform[3])||10,w=+it.width,h=+it.height||fs;return Number.isFinite(x)&&Number.isFinite(y)?{x,y,w:Number.isFinite(w)?w:0,h:Math.abs(h)||fs,fs,font:it.fontName||""}:null}
 function lines(items){let a=[];items.forEach((it,i)=>{if(typeof it.str!=="string"||!it.str)return;let b=itemBox(it);if(b)a.push({i,str:it.str,b})});a.sort((x,y)=>Math.abs(x.b.y-y.b.y)<4?x.b.x-y.b.x:y.b.y-x.b.y);let out=[];for(let q of a){let l=out.find(z=>Math.abs(z.y-q.b.y)<=Math.max(4,Math.min(12,q.b.h*.65)));if(!l){l={y:q.b.y,a:[]};out.push(l)}l.a.push(q)}for(let l of out){l.a.sort((x,y)=>x.b.x-y.b.x);l.text="";l.r=[];for(let q of l.a){let s=l.text.length;l.text+=q.str;l.r.push({s,e:l.text.length,q})}}return out}
-function add(text,kind,line,page,start,end){text=text.trim();let d=dc(text);if(d<7||d>15)return;if(kind==="normal"&&dateLike(text))return;let g=S.groups.get(text);if(!g){g={text,kind,count:0,format:fmt(text),reason:kind==="suspicious"?"Digits mixed with letters or unusual phone-like structure.":"Numeric phone-like pattern.",occ:[]};S.groups.set(text,g)}g.count++;g.occ.push({page,line,start,end})}
+function add(text,kind,line,page,start,end){text=text.trim();let d=dc(text);if(d<7||d>15)return;if(kind==="normal"&&dateLike(text))return;let g=S.groups.get(text);if(!g){g={text,kind,count:0,format:fmt(text),reason:kind==="suspicious"?"Digits mixed with letters or unusual phone-like structure.":"Numeric phone-like pattern.",occ:[]};S.groups.set(text,g)}g.count++;g.occ.push({page,line,start,end,boxes:boxes(line,start,end)})}
 function scan(line,page){let ranges=[],m;normalRE.lastIndex=0;while((m=normalRE.exec(line.text))){let t=m[0].trim();if(dc(t)>=7&&dc(t)<=15&&!dateLike(t)){ranges.push({s:m.index,e:m.index+m[0].length});add(t,"normal",line,page,m.index,m.index+m[0].length)}}suspiciousRE.lastIndex=0;while((m=suspiciousRE.exec(line.text))){let t=m[0].trim();if(!/[A-Za-z\p{L}]/u.test(t)||dc(t)<7||dc(t)>15)continue;if(ranges.some(r=>m.index<r.e&&m.index+m[0].length>r.s))continue;add(t,"suspicious",line,page,m.index,m.index+m[0].length)}}
 function analyzeLine(text,page){let ls=lines(text);for(let l of ls)scan(l,page)}
-function replacement(old,newNo){let ndigits=nd(newNo).replace(/\D/g,"");if(!ndigits)throw Error("New number must contain digits.");let a=nd(old),i=0,out="";for(let c of a)out+=/\d/.test(c)?(i<ndigits.length?ndigits[i++] : ""):c;if(i<ndigits.length)out+=ndigits.slice(i);return out}
+function replacement(old,newNo){
+  const src=String(old);
+  const raw=String(newNo);
+  const digits=(raw.match(/\p{Nd}/gu)||[]).map(c=>parseInt(c,10)).filter(Number.isFinite);
+  if(!digits.length)throw Error("New number must contain digits.");
+  let di=0,out="";
+  const mapDigit=(d,template)=>{
+    const cp=template.codePointAt(0);
+    if(cp>=0xFF10&&cp<=0xFF19)return String.fromCodePoint(0xFF10+d);
+    if(cp>=0x0660&&cp<=0x0669)return String.fromCodePoint(0x0660+d);
+    if(cp>=0x06F0&&cp<=0x06F9)return String.fromCodePoint(0x06F0+d);
+    return String(d);
+  };
+  for(const c of src){
+    if(/\p{Nd}/u.test(c)){
+      if(di<digits.length)out+=mapDigit(digits[di++],c);
+      else out+=c;
+    }else out+=c;
+  }
+  if(di<digits.length){
+    // Keep the original format and put any extra digits at the end.
+    out+=digits.slice(di).map(String).join("");
+  }
+  return out;
+}
 function boxes(line,start,end){let b=[];for(let r of line.r)if(r.e>start&&r.s<end)b.push(r.q.b);return b}
-function renderResults(){let body=$("resultsBody");body.innerHTML="";let vals=[...S.groups.values()].sort((a,b)=>a.kind===b.kind?b.count-a.count:(a.kind==="normal"?-1:1));let v=0,s=0,o=0;for(let g of vals){o+=g.count;if(g.kind==="normal")v++;else s++;let tr=document.createElement("tr");tr.innerHTML=`<td><code>${esc(g.text)}</code><div class="small" style="margin-top:5px">${g.kind==="normal"?"🟢 Normal phone":"🟡 Suspicious"}</div></td><td>${esc(g.format)}<div class="small">${esc(g.reason)}</div></td><td><b>${g.count}</b></td><td><label style="font-weight:400"><input type="checkbox" data-k="${encodeURIComponent(g.text)}"> Confirm / replace all</label></td>`;body.appendChild(tr)}body.querySelectorAll("input").forEach(c=>c.onchange=()=>{let k=decodeURIComponent(c.dataset.k);c.checked?S.selected.add(k):S.selected.delete(k);$("replaceBtn").disabled=!S.selected.size});$("validPill").textContent="Valid: "+v;$("suspiciousPill").textContent="Suspicious: "+s;$("occPill").textContent="Occurrences: "+o;$("suspiciousHelp").classList.toggle("hidden",!s)}
+function renderResults(){let body=$("resultsBody");body.innerHTML="";let vals=[...S.groups.values()].sort((a,b)=>a.kind===b.kind?b.count-a.count:(a.kind==="normal"?-1:1));let v=0,s=0,o=0;for(let g of vals){o+=g.count;if(g.kind==="normal")v++;else s++;let tr=document.createElement("tr");tr.innerHTML=`<td><code>${esc(g.text)}</code><div class="small" style="margin-top:5px">${g.kind==="normal"?"🟢 Normal phone":"🟡 Suspicious"}</div></td><td>${esc(g.format)}<div class="small">${esc(g.reason)}</div></td><td><b>${g.count}</b></td><td><label style="font-weight:400"><input type="checkbox" data-k="${encodeURIComponent(g.text)}" ${g.kind==="normal"?"checked":""}> Confirm / replace all</label></td>`;body.appendChild(tr)}body.querySelectorAll("input").forEach(c=>{let k=decodeURIComponent(c.dataset.k);if(c.checked)S.selected.add(k);c.onchange=()=>{c.checked?S.selected.add(k):S.selected.delete(k);$("replaceBtn").disabled=!S.selected.size}});$("validPill").textContent="Valid: "+v;$("suspiciousPill").textContent="Suspicious: "+s;$("occPill").textContent="Occurrences: "+o;$("suspiciousHelp").classList.toggle("hidden",!s)}
 async function analyze(){
   if(!S.file) return;
   try {
@@ -67,8 +91,13 @@ async function analyze(){
 }
 function dataBytes(url){let b=atob(url.split(",")[1]),a=new Uint8Array(b.length);for(let i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a}
 async function replaceAll(){let newNo=$("newNumber").value.trim();if(!newNo)return alert("Enter your new number first.");if(!S.selected.size)return alert("Confirm at least one format first.");try{$("replaceBtn").disabled=true;$("downloadCard").classList.add("hidden");st("Preparing replacement…");pg(2);let groups=[...S.groups.values()].filter(g=>S.selected.has(g.text)),total=groups.reduce((n,g)=>n+g.count,0),out=await PDFLib.PDFDocument.create();
-for(let p=1;p<=S.pdf.numPages;p++){let page=await S.pdf.getPage(p),base=page.getViewport({scale:1}),scale=2,view=page.getViewport({scale});let canvas=document.createElement("canvas");canvas.width=Math.ceil(view.width);canvas.height=Math.ceil(view.height);let ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);await page.render({canvasContext:ctx,viewport:view}).promise;let tc=await page.getTextContent({includeMarkedContent:false}),ls=lines(tc.items);
-for(let g of groups)for(let q of g.occ)if(q.page===p-1){let line=ls[q.line];if(!line)continue;let bs=boxes(line,q.start,q.end);if(!bs.length)continue;let x1=Math.min(...bs.map(b=>b.x)),x2=Math.max(...bs.map(b=>b.x+b.w)),y1=Math.min(...bs.map(b=>b.y-b.h)),y2=Math.max(...bs.map(b=>b.y));let a=view.convertToViewportPoint(x1,y1),b=view.convertToViewportPoint(x2,y2),x=Math.min(a[0],b[0])-3,y=Math.min(a[1],b[1])-3,w=Math.abs(b[0]-a[0])+6,h=Math.abs(b[1]-a[1])+6;ctx.fillStyle="#fff";ctx.fillRect(x,y,w,h);let fs=Math.max(8,Math.min(72,(y2-y1)*scale*.9));ctx.font=fs+"px Arial,Helvetica,sans-serif";ctx.fillStyle="#111";ctx.textBaseline="alphabetic";ctx.fillText(replacement(g.text,newNo),x+1,y+h-2)}let img=await out.embedPng(dataBytes(canvas.toDataURL("image/png")));let op=out.addPage([base.width,base.height]);op.drawImage(img,{x:0,y:0,width:base.width,height:base.height});canvas.width=1;canvas.height=1;pg(5+p/S.pdf.numPages*92);st("Replacing confirmed numbers…")}
+for(let p=1;p<=S.pdf.numPages;p++){let page=await S.pdf.getPage(p),base=page.getViewport({scale:1}),scale=2,view=page.getViewport({scale});let canvas=document.createElement("canvas");canvas.width=Math.ceil(view.width);canvas.height=Math.ceil(view.height);let ctx=canvas.getContext("2d",{alpha:false});ctx.fillStyle="#fff";ctx.fillRect(0,0,canvas.width,canvas.height);await page.render({canvasContext:ctx,viewport:view}).promise;for(let g of groups)for(let q of g.occ)if(q.page===p-1){let bs=(q.boxes||[]).filter(Boolean);if(!bs.length)continue;let x1=Math.min(...bs.map(b=>b.x)),x2=Math.max(...bs.map(b=>b.x+b.w)),y1=Math.min(...bs.map(b=>b.y-b.h)),y2=Math.max(...bs.map(b=>b.y));let a=view.convertToViewportPoint(x1,y1),b=view.convertToViewportPoint(x2,y2),x=Math.min(a[0],b[0])-3,y=Math.min(a[1],b[1])-3,w=Math.abs(b[0]-a[0])+6,h=Math.abs(b[1]-a[1])+6;ctx.fillStyle="#fff";ctx.fillRect(x,y,w,h);let newText=replacement(g.text,newNo);
+let fs=Math.max(8,Math.min(72,(y2-y1)*scale*.9));
+ctx.font=fs+"px Arial,Helvetica,sans-serif";
+// If the replacement is wider than the old number, reduce the font so it fits.
+let maxW=Math.max(10,w-2), measured=ctx.measureText(newText).width;
+if(measured>maxW)fs=Math.max(6,fs*maxW/measured);
+ctx.font=fs+"px Arial,Helvetica,sans-serif";ctx.fillStyle="#111";ctx.textBaseline="alphabetic";ctx.fillText(newText,x+1,y+h-2)}let img=await out.embedPng(dataBytes(canvas.toDataURL("image/png")));let op=out.addPage([base.width,base.height]);op.drawImage(img,{x:0,y:0,width:base.width,height:base.height});canvas.width=1;canvas.height=1;pg(5+p/S.pdf.numPages*92);st("Replacing confirmed numbers…")}
 S.out=await out.save({useObjectStreams:true,addDefaultPage:false});pg(100,false);$("downloadCard").classList.remove("hidden");$("downloadText").textContent=total+" confirmed occurrence(s) replaced. Original page dimensions preserved.";st("Complete — updated PDF is ready to download.")}catch(e){console.error(e);st("Replacement failed: "+e.message);alert("Replacement failed: "+e.message)}finally{$("replaceBtn").disabled=!S.selected.size}}
 function download(){if(!S.out)return;let name=(S.file.name||"document.pdf").replace(/\.pdf$/i,"")+"-replaced.pdf",u=URL.createObjectURL(new Blob([S.out],{type:"application/pdf"})),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),30000)}
 $("pdfFile").onchange=e=>{S.file=e.target.files[0]||null;$("analyzeBtn").disabled=!S.file;$("replaceBtn").disabled=true;$("downloadCard").classList.add("hidden");if(S.file)st("Selected: "+S.file.name)};$("analyzeBtn").onclick=analyze;$("replaceBtn").onclick=replaceAll;$("downloadBtn").onclick=download;$("clearBtn").onclick=()=>location.reload();
